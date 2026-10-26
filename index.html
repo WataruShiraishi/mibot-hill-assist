@@ -1,0 +1,222 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Mibot Hill Assist v0.1</title>
+<style>
+body {
+  font-family: -apple-system, sans-serif;
+  background: #101923;
+  color: white;
+  padding: 20px;
+  margin: 0;
+}
+h2 { margin-bottom: 5px; }
+p { color: #b8c6d2; }
+.panel {
+  background: #223241;
+  padding: 20px;
+  border-radius: 14px;
+  margin: 14px 0;
+}
+.value {
+  font-size: 38px;
+  font-weight: bold;
+  margin: 8px 0;
+}
+button {
+  width: 100%;
+  padding: 16px;
+  margin: 6px 0;
+  border: none;
+  border-radius: 10px;
+  font-size: 17px;
+  font-weight: bold;
+  background: #5ac8fa;
+  color: #10202b;
+}
+button:disabled { opacity: .45; }
+small { color: #b8c6d2; }
+</style>
+</head>
+<body>
+
+<h2>MIBOT HILL ASSIST</h2>
+<p>v0.1 / iPhone Sensor Monitor</p>
+
+<div class="panel">
+  <small>前後方向の相対傾斜</small>
+  <div class="value" id="pitch">-- °</div>
+  <small>参考勾配率</small>
+  <div class="value" id="grade">-- %</div>
+</div>
+
+<div class="panel">
+  <small>左右姿勢角</small>
+  <div class="value" id="roll">-- °</div>
+  <small>加速度ノルム（重力込み）</small>
+  <div class="value" id="accel">-- m/s²</div>
+</div>
+
+<div class="panel">
+  <small>状態</small>
+  <p id="status">計測待機中</p>
+  <small id="count">記録件数: 0</small>
+</div>
+
+<button id="start" onclick="startSensor()">
+センサー計測開始
+</button>
+<button onclick="calibrate()">
+現在の姿勢をゼロ校正
+</button>
+<button onclick="toggleRecord()" id="record">
+CSV記録開始
+</button>
+<button onclick="saveCSV()">
+CSV保存
+</button>
+
+<p><small>
+注意：参考計測用です。車両制御には使用しないでください。
+</small></p>
+
+<script>
+let beta = null;
+let gamma = null;
+let zeroBeta = 0;
+let accelNorm = null;
+let recording = false;
+let rows = [];
+let lastLog = 0;
+let started = false;
+
+const el = id => document.getElementById(id);
+
+function angleDiff(a, b) {
+  return ((a - b + 540) % 360) - 180;
+}
+
+async function startSensor() {
+  try {
+    const requests = [];
+
+    if (typeof DeviceOrientationEvent !== "undefined"
+      && typeof DeviceOrientationEvent.requestPermission === "function") {
+      requests.push(DeviceOrientationEvent.requestPermission());
+    }
+
+    if (typeof DeviceMotionEvent !== "undefined"
+      && typeof DeviceMotionEvent.requestPermission === "function") {
+      requests.push(DeviceMotionEvent.requestPermission());
+    }
+
+    const results = await Promise.all(requests);
+    if (results.some(x => x !== "granted")) {
+      el("status").textContent = "センサー権限が許可されませんでした";
+      return;
+    }
+
+    if (!started) {
+      window.addEventListener("deviceorientation", onOrientation);
+      window.addEventListener("devicemotion", onMotion);
+      started = true;
+    }
+
+    el("status").textContent = "計測中";
+    el("start").disabled = true;
+
+  } catch (e) {
+    el("status").textContent = "開始エラー: " + e.message;
+  }
+}
+
+function onOrientation(e) {
+  if (e.beta == null || e.gamma == null) return;
+
+  beta = e.beta;
+  gamma = e.gamma;
+
+  const pitch = angleDiff(beta, zeroBeta);
+  const grade = 100 * Math.tan(pitch * Math.PI / 180);
+
+  el("pitch").textContent = pitch.toFixed(2) + " °";
+  el("grade").textContent =
+    Math.abs(pitch) < 80 ? grade.toFixed(1) + " %" : "--";
+  el("roll").textContent = gamma.toFixed(2) + " °";
+
+  const now = Date.now();
+
+  if (recording && now - lastLog >= 100) {
+    lastLog = now;
+    rows.push([
+      new Date(now).toISOString(),
+      beta.toFixed(3),
+      gamma.toFixed(3),
+      pitch.toFixed(3),
+      grade.toFixed(3),
+      accelNorm == null ? "" : accelNorm.toFixed(3)
+    ]);
+    el("count").textContent = "記録件数: " + rows.length;
+
+    if (rows.length >= 6000) {
+      recording = false;
+      el("record").textContent = "CSV記録開始";
+      el("status").textContent = "記録上限。CSVを保存してください";
+    }
+  }
+}
+
+function onMotion(e) {
+  const a = e.accelerationIncludingGravity;
+  if (!a || a.x == null || a.y == null || a.z == null) return;
+
+  accelNorm = Math.hypot(a.x, a.y, a.z);
+  el("accel").textContent = accelNorm.toFixed(2) + " m/s²";
+}
+
+function calibrate() {
+  if (beta === null) {
+    el("status").textContent = "先に計測を開始してください";
+    return;
+  }
+  zeroBeta = beta;
+  el("status").textContent = "ゼロ校正完了";
+}
+
+function toggleRecord() {
+  if (beta === null) {
+    el("status").textContent = "先に計測を開始してください";
+    return;
+  }
+  recording = !recording;
+  el("record").textContent =
+    recording ? "CSV記録停止" : "CSV記録開始";
+}
+
+function saveCSV() {
+  if (!rows.length) {
+    el("status").textContent = "記録データがありません";
+    return;
+  }
+
+  const header =
+    "time,beta_deg,gamma_deg,relative_pitch_deg,grade_pct,accel_norm_mps2";
+  const csv = [header, ...rows.map(r => r.join(","))].join("\r\n");
+  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const url = URL.createObjectURL(blob);
+
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "mibot_sensor.csv";
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+}
+</script>
+</body>
+</html>
