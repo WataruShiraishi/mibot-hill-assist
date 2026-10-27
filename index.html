@@ -3,664 +3,589 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport"
- content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#c7f8e2">
 <title>MOTION CORE HILL ASSIST</title>
-
 <style>
-:root {
-  --text: #1e2b26;
-  --sub: #5d7469;
-  --line: #b7ead2;
+*{box-sizing:border-box}
+body{
+ margin:0;padding:16px 13px 30px;
+ font-family:-apple-system,BlinkMacSystemFont,sans-serif;
+ color:#20382b;
+ background:linear-gradient(140deg,#ddffec,#b8efd6,#eafff3);
+ min-height:100vh;
 }
-
-* {
-  box-sizing: border-box;
+.wrap{max-width:720px;margin:auto}
+.hero,.card{
+ background:white;
+ border:2px solid #b8e8d0;
+ border-radius:22px;
+ padding:16px;
+ margin-bottom:12px;
+ box-shadow:0 6px 20px #42775818;
 }
-
-body {
-  margin: 0;
-  padding: 18px 14px 28px;
-  min-height: 100vh;
-  font-family: -apple-system, BlinkMacSystemFont,
-               "Segoe UI", sans-serif;
-  color: var(--text);
-  background: radial-gradient(
-    circle at top left,
-    #d9fff0 0%,
-    #c7f8e2 35%,
-    #b6efd6 65%,
-    #eafff5 100%
-  );
+.hero{background:linear-gradient(120deg,#fff7d7,#fff,#ecfff4)}
+.head{display:flex;align-items:center;gap:8px}
+.logo{
+ width:80px;height:80px;object-fit:contain;
+ background:white;border-radius:16px;padding:2px;
+ flex-shrink:0;
 }
-
-.wrap {
-  max-width: 720px;
-  margin: 0 auto;
+.headtext{flex:1;min-width:0}
+h1{
+ margin:0;
+ font-size:clamp(10px,2.65vw,19px);
+ white-space:nowrap;letter-spacing:-.4px;
 }
-
-/* Header */
-.hero {
-  position: relative;
-  overflow: hidden;
-  background: linear-gradient(
-    135deg, #fff9d8, #ffffff 50%, #f0fff8
-  );
-  border: 2px solid var(--line);
-  border-radius: 28px;
-  padding: 16px 12px;
-  margin-bottom: 14px;
-  box-shadow: 0 10px 26px rgba(37,93,67,.10);
+.sub{font-size:12px;color:#64806f;margin-top:5px}
+.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+button{
+ border:0;border-radius:16px;padding:14px 9px;
+ font-size:16px;font-weight:bold;width:100%;
+ margin-bottom:10px;
 }
-
-.hero::before {
-  content: "";
-  position: absolute;
-  right: -28px;
-  top: -28px;
-  width: 110px;
-  height: 110px;
-  background: rgba(103,200,255,.20);
-  border-radius: 50%;
+button:disabled{opacity:.45}
+.start{background:#3cdb92;color:#14402c}
+.stop{background:#ff9999;color:#6b2424}
+.yellow{background:#ffe77a;color:#5a4600}
+.blue{background:#9cddff;color:#15445c}
+h2{font-size:15px;color:#60796a;margin:0 0 8px}
+.big{font-size:41px;font-weight:800;line-height:1.2}
+.smallbig{font-size:27px;font-weight:800;margin-top:6px}
+.note{font-size:12px;color:#637b6c;line-height:1.6}
+.sep{height:1px;background:#d9eee2;margin:13px 0}
+.torque{
+ background:linear-gradient(140deg,#fff,#edfff5);
+ border-color:#70dba5;
 }
-
-.title-row {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  gap: 9px;
+.torque .big{color:#07894e}
+.torque .smallbig{color:#21865b}
+.grid{display:grid;gap:12px;grid-template-columns:1fr}
+.status{
+ display:inline-block;border-radius:100px;
+ padding:10px 15px;background:#edf1ef;
+ color:#627568;font-weight:800;
+ border:2px solid #d7e2db;
 }
-
-.logo-badge {
-  width: 82px;
-  height: 82px;
-  min-width: 82px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px;
-  background: #ffffff;
-  border: 1px solid #d8eee3;
-  box-shadow: 0 8px 20px rgba(30,170,106,.15);
-  overflow: hidden;
+.status.running{
+ background:#d9ffeb;color:#00884c;border-color:#26ce7c;
 }
-
-.logo-badge img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: contain;
-  padding: 2px;
+.status.stopped,.status.error{
+ background:#ffe1e1;color:#ba2836;border-color:#ff7777;
 }
-
-.heading {
-  min-width: 0;
-  flex: 1;
+.status.running:before,.status.stopped:before,
+.status.error:before{content:"● "}
+label{
+ display:block;font-size:13px;font-weight:bold;
+ color:#526b5c;margin-bottom:5px;
 }
-
-h1 {
-  margin: 0;
-  font-size: clamp(10px, 2.65vw, 19px);
-  font-weight: 800;
-  line-height: 1.3;
-  letter-spacing: -.35px;
-  white-space: nowrap;
+input{
+ width:100%;padding:12px;
+ font-size:16px;border:1px solid #b8dac7;
+ border-radius:11px;background:#fafffc;
 }
-
-.sub {
-  margin-top: 5px;
-  color: var(--sub);
-  font-size: 12px;
-  font-weight: 600;
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.warning{
+ background:#fff5d9;color:#795b20;
+ padding:11px;border-radius:12px;
+ font-size:12px;line-height:1.6;margin-top:10px;
 }
-
-/* Buttons */
-.controls {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-  margin-bottom: 12px;
+#count{font-size:13px;color:#637b6c;margin-top:10px}
+.footer{font-size:12px;color:#637b6c;line-height:1.7}
+@media(min-width:700px){
+ .grid{grid-template-columns:1fr 1fr}
 }
-
-button {
-  appearance: none;
-  border: none;
-  border-radius: 18px;
-  padding: 15px 12px;
-  font-size: 17px;
-  font-weight: 800;
-  box-shadow: 0 8px 18px rgba(40,80,60,.10);
-  cursor: pointer;
-}
-
-button:disabled {
-  opacity: .45;
-  cursor: default;
-}
-
-.btn-start {
-  background: linear-gradient(#4ee09d,#22c977);
-  color: #0f2c1f;
-}
-
-.btn-stop {
-  background: linear-gradient(#ffc0c0,#ff8d8d);
-  color: #4a1717;
-}
-
-.btn-sub {
-  width: 100%;
-  margin-top: 10px;
-  background: linear-gradient(#fff8d1,#ffe77a);
-  color: #564200;
-}
-
-.btn-sub2 {
-  width: 100%;
-  margin-top: 10px;
-  background: linear-gradient(#daf3ff,#8ad8ff);
-  color: #0a3850;
-}
-
-/* Data cards */
-.grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 12px;
-  margin-bottom: 14px;
-}
-
-.card {
-  background: white;
-  border: 2px solid var(--line);
-  border-radius: 24px;
-  padding: 16px;
-  box-shadow: 0 8px 20px rgba(49,103,79,.08);
-}
-
-.card h2 {
-  margin: 0 0 4px;
-  font-size: 15px;
-  color: var(--sub);
-}
-
-.value {
-  font-size: 42px;
-  font-weight: 800;
-  line-height: 1.1;
-  margin: 4px 0 8px;
-}
-
-.unit-note {
-  color: var(--sub);
-  font-size: 13px;
-}
-
-.mini-value {
-  font-size: 30px;
-  font-weight: 800;
-  margin-top: 6px;
-}
-
-/* Status */
-.status-box {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.status-pill {
-  display: inline-block;
-  margin-top: 6px;
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: #edf1ef;
-  color: #60766a;
-  border: 2px solid #d7e1da;
-  font-size: 16px;
-  font-weight: 800;
-}
-
-.status-pill.running {
-  background: #d9ffeb;
-  color: #00884c;
-  border-color: #26ce7c;
-}
-
-.status-pill.stopped {
-  background: #ffe1e1;
-  color: #c52b37;
-  border-color: #ff7777;
-}
-
-.status-pill.running::before,
-.status-pill.stopped::before {
-  content: "● ";
-}
-
-.count {
-  color: var(--sub);
-  font-size: 14px;
-  font-weight: 700;
-}
-
-.footer-note {
-  margin-top: 12px;
-  padding: 12px;
-  border-radius: 16px;
-  background: rgba(255,255,255,.75);
-  border: 1px solid #dcefe6;
-  color: var(--sub);
-  font-size: 12px;
-  line-height: 1.6;
-}
-
-@media (max-width: 380px) {
-  .hero {
-    padding: 14px 10px;
-  }
-
-  .logo-badge {
-    width: 74px;
-    height: 74px;
-    min-width: 74px;
-  }
-
-  .title-row {
-    gap: 6px;
-  }
-}
-
-@media (min-width: 700px) {
-  .grid {
-    grid-template-columns: 1fr 1fr;
-  }
+@media(max-width:380px){
+ .logo{width:70px;height:70px}
+ h1{font-size:clamp(9px,2.6vw,12px)}
 }
 </style>
 </head>
-
 <body>
 <div class="wrap">
 
-  <header class="hero">
-    <div class="title-row">
-      <div class="logo-badge">
-        <img src="logo.png" alt="Motion Core Logo">
-      </div>
-      <div class="heading">
-        <h1>MOTION CORE HILL ASSIST</h1>
-        <div class="sub">
-          v0.3 / iPhone Sensor Monitor
-        </div>
-      </div>
-    </div>
-  </header>
-
-  <div class="controls">
-    <button id="startBtn"
-      class="btn-start"
-      onclick="startSensor()">
-      ▶ スタート
-    </button>
-
-    <button id="stopBtn"
-      class="btn-stop"
-      onclick="stopSensor()"
-      disabled>
-      ■ ストップ
-    </button>
+<header class="hero">
+ <div class="head">
+  <img src="logo.png" class="logo" alt="MOTION CORE">
+  <div class="headtext">
+   <h1>MOTION CORE HILL ASSIST</h1>
+   <div class="sub">v0.4 / iPhone Sensor Torque Monitor</div>
   </div>
+ </div>
+</header>
 
-  <div class="grid">
-    <section class="card">
-      <h2>前後方向の相対傾斜</h2>
-      <div class="value" id="pitch">-- °</div>
+<div class="controls">
+ <button id="startBtn" class="start" onclick="startSensor()">▶ スタート</button>
+ <button id="stopBtn" class="stop" onclick="stopSensor()" disabled>■ ストップ</button>
+</div>
 
-      <div class="unit-note">参考勾配率</div>
-      <div class="mini-value" id="grade">-- %</div>
-    </section>
+<div class="grid">
+ <section class="card">
+  <h2>前後方向の相対傾斜</h2>
+  <div id="pitch" class="big">-- °</div>
+  <div class="note">iPhoneから取得した参考勾配率</div>
+  <div id="grade" class="smallbig">-- %</div>
+ </section>
+ <section class="card">
+  <h2>左右姿勢角</h2>
+  <div id="roll" class="big">-- °</div>
+  <div class="note">加速度ノルム（重力込み）</div>
+  <div id="accel" class="smallbig">-- m/s²</div>
+ </section>
+</div>
 
-    <section class="card">
-      <h2>左右姿勢角</h2>
-      <div class="value" id="roll">-- °</div>
+<section class="card torque">
+ <h2>HILL HOLD 理論必要トルク</h2>
+ <div class="note">必要タイヤトルク（駆動輪合計）</div>
+ <div class="big" id="wheelTorque">-- Nm</div>
+ <div class="sep"></div>
+ <div class="note">必要モータートルク（概算）</div>
+ <div class="smallbig" id="motorTorque">-- Nm</div>
+ <div class="sep"></div>
+ <div class="note">演算に使用したセンサー勾配</div>
+ <div class="smallbig" id="usedGrade">-- %</div>
+ <p class="note" id="torqueInfo">センサー計測と水平校正が必要です</p>
+</section>
 
-      <div class="unit-note">
-        加速度ノルム（重力込み）
-      </div>
-      <div class="mini-value" id="accel">
-        -- m/s²
-      </div>
-    </section>
+<section class="card">
+ <h2>車両スペック設定</h2>
+ <div class="fields">
+  <div>
+   <label for="mass">車両質量 [kg]</label>
+   <input id="mass" type="number" value="430"
+    min="1" step="1" oninput="recalculate()">
   </div>
-
-  <section class="card status-box">
-    <div>
-      <h2>状態</h2>
-      <div class="status-pill" id="status">
-        計測待機中
-      </div>
-    </div>
-
-    <div class="count" id="count">
-      記録件数: 0
-    </div>
-  </section>
-
-  <button class="btn-sub" onclick="calibrate()">
-    ⚙ 現在の姿勢をゼロ校正
-  </button>
-
-  <button class="btn-sub2"
-    id="recordBtn"
-    onclick="toggleRecord()">
-    ⏺ CSV記録開始
-  </button>
-
-  <button class="btn-sub" onclick="saveCSV()">
-    ⬇ CSV保存
-  </button>
-
-  <div class="footer-note">
-    注意：参考計測用です。
-    車両制御には直接使用しないでください。
-    停車状態または安全な状態で確認してください。
+  <div>
+   <label for="payload">乗員・積載 [kg]</label>
+   <input id="payload" type="number" value="70"
+    min="0" step="1" oninput="recalculate()">
   </div>
+  <div>
+   <label for="radius">タイヤ有効半径 [m]</label>
+   <input id="radius" type="number" value="0.254"
+    min="0.01" step="0.001" oninput="recalculate()">
+  </div>
+  <div>
+   <label for="ratio">減速比</label>
+   <input id="ratio" type="number" value="11"
+    min="0.1" step="0.1" oninput="recalculate()">
+  </div>
+  <div style="grid-column:1/-1">
+   <label for="eff">駆動系効率（0～1）</label>
+   <input id="eff" type="number" value="0.95"
+    min="0.01" max="1" step="0.01"
+    oninput="recalculate()">
+  </div>
+ </div>
+ <div class="sep"></div>
+ <div id="massInfo" class="note">総質量：500 kg</div>
+</section>
 
+<section class="card">
+ <h2>計測状態</h2>
+ <div id="status" class="status">計測待機中</div>
+ <div id="count">記録件数: 0</div>
+ <div class="note" id="calState">水平基準：未校正</div>
+ <div class="warning">
+  水平校正は、iPhoneを車体に固定し、車両を既知の水平面に置いて実施してください。
+  坂道で校正した場合、路面の絶対勾配は求まりません。
+ </div>
+</section>
+
+<button class="yellow" onclick="calibrate()">
+ ⚙ 水平面でゼロ校正
+</button>
+<button class="blue" id="recordBtn" onclick="toggleRecord()">
+ ⏺ CSV記録開始
+</button>
+<button class="yellow" onclick="saveCSV()">
+ ⬇ CSV保存
+</button>
+<button class="blue" onclick="clearCSV()">
+ 🗑 記録データを消去
+</button>
+
+<div class="footer">
+ 本アプリは研究・評価用です。
+ センサー勾配は端末姿勢に基づく参考値です。
+ トルクは重力釣合いの理論値であり、
+ 実車の保持制御や安全判断には使用しないでください。
+</div>
 </div>
 
 <script>
 "use strict";
 
-let beta = null;
-let gamma = null;
-let zeroBeta = 0;
-let accelNorm = null;
-
-let sensorActive = false;
-let recording = false;
-let rows = [];
-let lastLog = 0;
-
-const MAX_ROWS = 6000;
 const el = id => document.getElementById(id);
+const G = 9.80665;
+const MAX_ROWS = 6000;
+
+let active = false;
+let recording = false;
+let calibrated = false;
+let zeroBeta = 0;
+let beta = null, gamma = null;
+let pitch = null, grade = null;
+let accelNorm = null;
+let wheelTorque = null, motorTorque = null;
+let gyro = {x:null,y:null,z:null};
+let linearAcc = {x:null,y:null,z:null};
+let rows = [], lastLog = 0;
+let calibrationStale = false;
+
+function readNumber(id) {
+ const s = el(id).value.trim();
+ return s === "" ? NaN : Number(s);
+}
 
 function setStatus(message, mode) {
-  const status = el("status");
-  status.textContent = message;
-  status.className = "status-pill";
-
-  if (mode === "running") {
-    status.classList.add("running");
-  } else if (mode === "stopped") {
-    status.classList.add("stopped");
-  }
+ el("status").textContent = message;
+ el("status").className =
+   "status" + (mode ? " " + mode : "");
 }
 
-function angleDiff(a, b) {
-  return ((a - b + 540) % 360) - 180;
+function buttons() {
+ el("startBtn").disabled = active;
+ el("stopBtn").disabled = !active;
 }
 
-function setButtons() {
-  el("startBtn").disabled = sensorActive;
-  el("stopBtn").disabled = !sensorActive;
+function diffAngle(a,b) {
+ return ((a-b+540)%360)-180;
+}
+
+function updateDisplay() {
+ el("pitch").textContent =
+   pitch === null ? "-- °" : pitch.toFixed(2)+" °";
+ el("roll").textContent =
+   gamma === null ? "-- °" : gamma.toFixed(2)+" °";
+ el("grade").textContent =
+   grade === null ? "-- %" : grade.toFixed(2)+" %";
+ el("accel").textContent =
+   accelNorm === null ? "-- m/s²" :
+   accelNorm.toFixed(2)+" m/s²";
+}
+
+function recalculate() {
+ const mass = readNumber("mass");
+ const payload = readNumber("payload");
+ const radius = readNumber("radius");
+ const ratio = readNumber("ratio");
+ const eff = readNumber("eff");
+ const total = mass + payload;
+
+ const valid = Number.isFinite(total) &&
+   mass > 0 && payload >= 0 &&
+   radius > 0 && ratio > 0 &&
+   eff > 0 && eff <= 1;
+
+ el("massInfo").textContent = valid
+   ? "総質量："+total.toFixed(1)+" kg"
+   : "車両スペックを確認してください";
+
+ // Do not calculate from an uncalibrated
+ // or stopped sensor.
+ if (!valid || !active || !calibrated ||
+     grade === null) {
+   wheelTorque = null;
+   motorTorque = null;
+   el("wheelTorque").textContent = "-- Nm";
+   el("motorTorque").textContent = "-- Nm";
+   el("usedGrade").textContent = "-- %";
+   el("torqueInfo").textContent = !valid
+     ? "車両スペックが不正です"
+     : !calibrated
+     ? "水平面でゼロ校正してください"
+     : "有効なセンサーデータがありません";
+   return;
+ }
+
+ // Slope percent -> sin(theta)
+ const slope = grade / 100;
+ const sinTheta =
+   slope / Math.sqrt(1+slope*slope);
+
+ // Gravity balancing torque magnitude
+ wheelTorque =
+   total * G * radius * Math.abs(sinTheta);
+
+ motorTorque =
+   wheelTorque / (ratio * eff);
+
+ el("wheelTorque").textContent =
+   wheelTorque.toFixed(1)+" Nm";
+ el("motorTorque").textContent =
+   motorTorque.toFixed(1)+" Nm";
+ el("usedGrade").textContent =
+   grade.toFixed(2)+" %";
+ el("torqueInfo").textContent =
+   "iPhone相対姿勢に基づく参考演算";
 }
 
 async function startSensor() {
-  if (sensorActive) return;
+ if (active) return;
 
-  try {
-    if (typeof DeviceOrientationEvent === "undefined") {
-      throw new Error("姿勢センサーに対応していません");
-    }
+ try {
+   if (!window.isSecureContext) {
+     throw Error("HTTPSで開いてください");
+   }
+   if (typeof DeviceOrientationEvent === "undefined") {
+     throw Error("姿勢センサーを利用できません");
+   }
 
-    // iOSではボタン操作から権限を要求する
-    // 必要なセンサーについて順番に要求する
-    if (typeof DeviceOrientationEvent.requestPermission
-        === "function") {
-      const result =
-        await DeviceOrientationEvent.requestPermission();
+   // Both requests start directly from the tap.
+   const permissions = [];
+   if (typeof DeviceOrientationEvent.requestPermission
+       === "function") {
+     permissions.push(
+       DeviceOrientationEvent.requestPermission()
+     );
+   }
+   if (typeof DeviceMotionEvent !== "undefined" &&
+       typeof DeviceMotionEvent.requestPermission
+       === "function") {
+     permissions.push(
+       DeviceMotionEvent.requestPermission()
+     );
+   }
 
-      if (result !== "granted") {
-        throw new Error("姿勢センサーが許可されませんでした");
-      }
-    }
+   const results = await Promise.all(permissions);
+   if (results.some(p => p !== "granted")) {
+     throw Error("センサー使用が許可されませんでした");
+   }
 
-    if (typeof DeviceMotionEvent !== "undefined" &&
-        typeof DeviceMotionEvent.requestPermission
-        === "function") {
-      const result =
-        await DeviceMotionEvent.requestPermission();
+   active = true;
+   beta = null;
+   gamma = null;
+   pitch = null;
+   grade = null;
+   accelNorm = null;
 
-      if (result !== "granted") {
-        throw new Error("加速度センサーが許可されませんでした");
-      }
-    }
+   window.addEventListener(
+     "deviceorientation",onOrientation);
+   window.addEventListener(
+     "devicemotion",onMotion);
 
-    sensorActive = true;
-
-    window.addEventListener(
-      "deviceorientation", onOrientation
-    );
-    window.addEventListener(
-      "devicemotion", onMotion
-    );
-
-    setButtons();
-    setStatus("計測中", "running");
-
-  } catch (error) {
-    sensorActive = false;
-    setButtons();
-    setStatus(
-      "開始エラー: " + error.message, "stopped"
-    );
-  }
+   buttons();
+   updateDisplay();
+   recalculate();
+   setStatus("計測中","running");
+ } catch(error) {
+   setStatus("開始エラー："+error.message,"error");
+ }
 }
 
 function stopSensor() {
-  if (!sensorActive) return;
+ if (!active) return;
 
-  window.removeEventListener(
-    "deviceorientation", onOrientation
-  );
-  window.removeEventListener(
-    "devicemotion", onMotion
-  );
+ window.removeEventListener(
+   "deviceorientation",onOrientation);
+ window.removeEventListener(
+   "devicemotion",onMotion);
 
-  sensorActive = false;
+ active = false;
+ recording = false;
+ el("recordBtn").textContent = "⏺ CSV記録開始";
+ buttons();
+ setStatus("計測停止中","stopped");
 
-  // 計測停止時にはCSV記録も停止する
-  recording = false;
-  el("recordBtn").textContent = "⏺ CSV記録開始";
-
-  setButtons();
-  setStatus("計測停止中", "stopped");
+ // Avoid displaying stale torque as live.
+ recalculate();
 }
 
 function onOrientation(event) {
-  if (!sensorActive) return;
+ if (!active ||
+     event.beta == null ||
+     event.gamma == null) return;
 
-  if (event.beta == null ||
-      event.gamma == null) {
-    return;
-  }
+ beta = event.beta;
+ gamma = event.gamma;
 
-  beta = event.beta;
-  gamma = event.gamma;
+ if (calibrated) {
+   pitch = diffAngle(beta,zeroBeta);
 
-  const pitch = angleDiff(beta, zeroBeta);
-  const validGrade = Math.abs(pitch) < 80;
+   // Suppress singular / large-angle results.
+   grade = Math.abs(pitch) < 45
+     ? 100*Math.tan(pitch*Math.PI/180)
+     : null;
+ } else {
+   pitch = null;
+   grade = null;
+ }
 
-  const grade = validGrade
-    ? 100 * Math.tan(pitch * Math.PI / 180)
-    : null;
-
-  el("pitch").textContent =
-    pitch.toFixed(2) + " °";
-
-  el("grade").textContent =
-    grade === null
-      ? "-- %"
-      : grade.toFixed(1) + " %";
-
-  el("roll").textContent =
-    gamma.toFixed(2) + " °";
-
-  const now = Date.now();
-
-  if (recording && now - lastLog >= 100) {
-    lastLog = now;
-
-    rows.push([
-      new Date(now).toISOString(),
-      beta.toFixed(3),
-      gamma.toFixed(3),
-      pitch.toFixed(3),
-      grade === null ? "" : grade.toFixed(3),
-      accelNorm === null
-        ? ""
-        : accelNorm.toFixed(3)
-    ]);
-
-    el("count").textContent =
-      "記録件数: " + rows.length;
-
-    if (rows.length >= MAX_ROWS) {
-      recording = false;
-      el("recordBtn").textContent =
-        "⏺ CSV記録開始";
-
-      setStatus(
-        "記録上限に到達。CSVを保存してください",
-        "running"
-      );
-    }
-  }
+ updateDisplay();
+ recalculate();
 }
 
 function onMotion(event) {
-  if (!sensorActive) return;
+ if (!active) return;
 
-  const a = event.accelerationIncludingGravity;
+ const a = event.accelerationIncludingGravity;
+ if (a && a.x != null &&
+     a.y != null && a.z != null) {
+   accelNorm = Math.hypot(a.x,a.y,a.z);
+ }
 
-  if (!a ||
-      a.x == null ||
-      a.y == null ||
-      a.z == null) {
-    return;
-  }
+ const r = event.rotationRate;
+ gyro = {
+   x:r?.beta ?? null,
+   y:r?.gamma ?? null,
+   z:r?.alpha ?? null
+ };
 
-  accelNorm = Math.hypot(a.x, a.y, a.z);
+ const aa = event.acceleration;
+ linearAcc = {
+   x:aa?.x ?? null,
+   y:aa?.y ?? null,
+   z:aa?.z ?? null
+ };
 
-  el("accel").textContent =
-    accelNorm.toFixed(2) + " m/s²";
+ updateDisplay();
+
+ const now = Date.now();
+ if (recording && now-lastLog >= 100) {
+   lastLog = now;
+   addLog(now);
+ }
 }
 
 function calibrate() {
-  if (!sensorActive || beta === null) {
-    setStatus(
-      "先に計測を開始してください",
-      sensorActive ? "running" : "stopped"
-    );
-    return;
-  }
+ if (!active || beta === null) {
+   setStatus("計測開始後に校正してください",
+     active?"running":"stopped");
+   return;
+ }
 
-  zeroBeta = beta;
+ if (!confirm(
+   "車両は既知の水平面にあり、iPhoneは車体に固定されていますか？"
+ )) return;
 
-  setStatus(
-    "ゼロ校正完了",
-    "running"
-  );
+ zeroBeta = beta;
+ calibrated = true;
+ calibrationStale = false;
+
+ el("calState").textContent =
+   "水平基準：校正済み（この起動中のみ有効）";
+
+ pitch = 0;
+ grade = 0;
+ updateDisplay();
+ recalculate();
+ setStatus("水平ゼロ校正完了","running");
+}
+
+function n(v) {
+ return v !== null && Number.isFinite(v)
+   ? v.toFixed(4) : "";
+}
+
+function addLog(t) {
+ rows.push([
+   new Date(t).toISOString(),
+   n(beta),n(gamma),
+   n(pitch),n(grade),
+   n(wheelTorque),n(motorTorque),
+   n(accelNorm),
+   n(gyro.x),n(gyro.y),n(gyro.z),
+   n(linearAcc.x),n(linearAcc.y),n(linearAcc.z),
+   readNumber("mass"),readNumber("payload"),
+   readNumber("radius"),readNumber("ratio"),
+   readNumber("eff")
+ ]);
+
+ el("count").textContent =
+   "記録件数: "+rows.length;
+
+ if (rows.length >= MAX_ROWS) {
+   recording = false;
+   el("recordBtn").textContent =
+     "⏺ CSV記録開始";
+   setStatus("記録上限。CSVを保存してください",
+     "running");
+ }
 }
 
 function toggleRecord() {
-  if (!sensorActive || beta === null) {
-    setStatus(
-      "先に計測を開始してください",
-      sensorActive ? "running" : "stopped"
-    );
-    return;
-  }
+ if (!active || !calibrated) {
+   setStatus("計測開始と水平校正が必要です",
+     active?"running":"stopped");
+   return;
+ }
+ if (!recording && rows.length >= MAX_ROWS) {
+   setStatus("記録上限です。CSV保存後に消去してください",
+     "running");
+   return;
+ }
 
-  if (!recording && rows.length >= MAX_ROWS) {
-    setStatus(
-      "CSVを保存後、記録を消去してください",
-      "running"
-    );
-    return;
-  }
-
-  recording = !recording;
-
-  el("recordBtn").textContent =
-    recording
-      ? "⏹ CSV記録停止"
-      : "⏺ CSV記録開始";
-
-  setStatus(
-    recording ? "CSV記録中" : "計測中",
-    "running"
-  );
+ recording = !recording;
+ el("recordBtn").textContent = recording
+   ? "⏹ CSV記録停止"
+   : "⏺ CSV記録開始";
+ setStatus(recording?"CSV記録中":"計測中",
+   "running");
 }
 
 function saveCSV() {
-  if (!rows.length) {
-    setStatus(
-      "記録データがありません",
-      sensorActive ? "running" : "stopped"
-    );
-    return;
-  }
+ if (!rows.length) {
+   setStatus("記録データがありません",
+     active?"running":"stopped");
+   return;
+ }
 
-  const header = [
-    "time",
-    "beta_deg",
-    "gamma_deg",
-    "relative_pitch_deg",
-    "grade_pct",
-    "accel_norm_mps2"
-  ].join(",");
+ const header = [
+   "time","beta_deg","gamma_deg",
+   "relative_pitch_deg","sensor_grade_pct",
+   "wheel_torque_Nm","motor_torque_Nm",
+   "accel_norm_mps2",
+   "gyro_x_degps","gyro_y_degps","gyro_z_degps",
+   "linear_acc_x_mps2","linear_acc_y_mps2",
+   "linear_acc_z_mps2",
+   "vehicle_mass_kg","payload_mass_kg",
+   "tire_radius_m","gear_ratio","efficiency"
+ ];
 
-  const csv = [
-    header,
-    ...rows.map(row => row.join(","))
-  ].join("\r\n");
+ const csv = [
+   header.join(","),
+   ...rows.map(r=>r.join(","))
+ ].join("\r\n");
 
-  const blob = new Blob(
-    ["\uFEFF", csv],
-    { type: "text/csv;charset=utf-8" }
-  );
+ const blob = new Blob(
+   ["\uFEFF",csv],
+   {type:"text/csv;charset=utf-8"}
+ );
+ const url = URL.createObjectURL(blob);
+ const a = document.createElement("a");
+ a.href = url;
+ a.download = "motioncore_hill_v04.csv";
+ document.body.appendChild(a);
+ a.click();
+ a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),5000);
 
-  const url = URL.createObjectURL(blob);
-  const link = document.createElement("a");
-
-  link.href = url;
-  link.download = "motioncore_hill_sensor.csv";
-
-  document.body.appendChild(link);
-  link.click();
-  link.remove();
-
-  setTimeout(() => {
-    URL.revokeObjectURL(url);
-  }, 5000);
-
-  setStatus(
-    "CSV保存操作を実行しました",
-    sensorActive ? "running" : "stopped"
-  );
+ setStatus("CSV保存操作を実行しました",
+   active?"running":"stopped");
 }
 
-// 画面を離れる際、記録を停止する
-document.addEventListener("visibilitychange", () => {
-  if (document.hidden && sensorActive) {
-    stopSensor();
-  }
+function clearCSV() {
+ if (recording) {
+   setStatus("記録停止後に消去してください","running");
+   return;
+ }
+ if (!rows.length) return;
+ if (!confirm("記録を消去しますか？")) return;
+
+ rows = [];
+ lastLog = 0;
+ el("count").textContent = "記録件数: 0";
+ setStatus("記録データを消去しました",
+   active?"running":"stopped");
+}
+
+document.addEventListener("visibilitychange",()=>{
+ if (document.hidden && active) stopSensor();
 });
 
-setButtons();
+buttons();
+recalculate();
 </script>
 </body>
 </html>
