@@ -3,220 +3,664 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Mibot Hill Assist v0.1</title>
+<meta name="viewport"
+ content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#c7f8e2">
+<title>MOTION CORE HILL ASSIST</title>
+
 <style>
+:root {
+  --text: #1e2b26;
+  --sub: #5d7469;
+  --line: #b7ead2;
+}
+
+* {
+  box-sizing: border-box;
+}
+
 body {
-  font-family: -apple-system, sans-serif;
-  background: #101923;
-  color: white;
-  padding: 20px;
   margin: 0;
+  padding: 18px 14px 28px;
+  min-height: 100vh;
+  font-family: -apple-system, BlinkMacSystemFont,
+               "Segoe UI", sans-serif;
+  color: var(--text);
+  background: radial-gradient(
+    circle at top left,
+    #d9fff0 0%,
+    #c7f8e2 35%,
+    #b6efd6 65%,
+    #eafff5 100%
+  );
 }
-h2 { margin-bottom: 5px; }
-p { color: #b8c6d2; }
-.panel {
-  background: #223241;
-  padding: 20px;
-  border-radius: 14px;
-  margin: 14px 0;
+
+.wrap {
+  max-width: 720px;
+  margin: 0 auto;
 }
-.value {
-  font-size: 38px;
-  font-weight: bold;
-  margin: 8px 0;
+
+/* Header */
+.hero {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(
+    135deg, #fff9d8, #ffffff 50%, #f0fff8
+  );
+  border: 2px solid var(--line);
+  border-radius: 28px;
+  padding: 16px 12px;
+  margin-bottom: 14px;
+  box-shadow: 0 10px 26px rgba(37,93,67,.10);
 }
-button {
+
+.hero::before {
+  content: "";
+  position: absolute;
+  right: -28px;
+  top: -28px;
+  width: 110px;
+  height: 110px;
+  background: rgba(103,200,255,.20);
+  border-radius: 50%;
+}
+
+.title-row {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.logo-badge {
+  width: 82px;
+  height: 82px;
+  min-width: 82px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px;
+  background: #ffffff;
+  border: 1px solid #d8eee3;
+  box-shadow: 0 8px 20px rgba(30,170,106,.15);
+  overflow: hidden;
+}
+
+.logo-badge img {
+  display: block;
   width: 100%;
-  padding: 16px;
-  margin: 6px 0;
-  border: none;
-  border-radius: 10px;
-  font-size: 17px;
-  font-weight: bold;
-  background: #5ac8fa;
-  color: #10202b;
+  height: 100%;
+  object-fit: contain;
+  padding: 2px;
 }
-button:disabled { opacity: .45; }
-small { color: #b8c6d2; }
+
+.heading {
+  min-width: 0;
+  flex: 1;
+}
+
+h1 {
+  margin: 0;
+  font-size: clamp(10px, 2.65vw, 19px);
+  font-weight: 800;
+  line-height: 1.3;
+  letter-spacing: -.35px;
+  white-space: nowrap;
+}
+
+.sub {
+  margin-top: 5px;
+  color: var(--sub);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+/* Buttons */
+.controls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+button {
+  appearance: none;
+  border: none;
+  border-radius: 18px;
+  padding: 15px 12px;
+  font-size: 17px;
+  font-weight: 800;
+  box-shadow: 0 8px 18px rgba(40,80,60,.10);
+  cursor: pointer;
+}
+
+button:disabled {
+  opacity: .45;
+  cursor: default;
+}
+
+.btn-start {
+  background: linear-gradient(#4ee09d,#22c977);
+  color: #0f2c1f;
+}
+
+.btn-stop {
+  background: linear-gradient(#ffc0c0,#ff8d8d);
+  color: #4a1717;
+}
+
+.btn-sub {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(#fff8d1,#ffe77a);
+  color: #564200;
+}
+
+.btn-sub2 {
+  width: 100%;
+  margin-top: 10px;
+  background: linear-gradient(#daf3ff,#8ad8ff);
+  color: #0a3850;
+}
+
+/* Data cards */
+.grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.card {
+  background: white;
+  border: 2px solid var(--line);
+  border-radius: 24px;
+  padding: 16px;
+  box-shadow: 0 8px 20px rgba(49,103,79,.08);
+}
+
+.card h2 {
+  margin: 0 0 4px;
+  font-size: 15px;
+  color: var(--sub);
+}
+
+.value {
+  font-size: 42px;
+  font-weight: 800;
+  line-height: 1.1;
+  margin: 4px 0 8px;
+}
+
+.unit-note {
+  color: var(--sub);
+  font-size: 13px;
+}
+
+.mini-value {
+  font-size: 30px;
+  font-weight: 800;
+  margin-top: 6px;
+}
+
+/* Status */
+.status-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.status-pill {
+  display: inline-block;
+  margin-top: 6px;
+  padding: 10px 16px;
+  border-radius: 999px;
+  background: #edf1ef;
+  color: #60766a;
+  border: 2px solid #d7e1da;
+  font-size: 16px;
+  font-weight: 800;
+}
+
+.status-pill.running {
+  background: #d9ffeb;
+  color: #00884c;
+  border-color: #26ce7c;
+}
+
+.status-pill.stopped {
+  background: #ffe1e1;
+  color: #c52b37;
+  border-color: #ff7777;
+}
+
+.status-pill.running::before,
+.status-pill.stopped::before {
+  content: "● ";
+}
+
+.count {
+  color: var(--sub);
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.footer-note {
+  margin-top: 12px;
+  padding: 12px;
+  border-radius: 16px;
+  background: rgba(255,255,255,.75);
+  border: 1px solid #dcefe6;
+  color: var(--sub);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 380px) {
+  .hero {
+    padding: 14px 10px;
+  }
+
+  .logo-badge {
+    width: 74px;
+    height: 74px;
+    min-width: 74px;
+  }
+
+  .title-row {
+    gap: 6px;
+  }
+}
+
+@media (min-width: 700px) {
+  .grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
 </style>
 </head>
+
 <body>
+<div class="wrap">
 
-<h2>MIBOT HILL ASSIST</h2>
-<p>v0.1 / iPhone Sensor Monitor</p>
+  <header class="hero">
+    <div class="title-row">
+      <div class="logo-badge">
+        <img src="logo.png" alt="Motion Core Logo">
+      </div>
+      <div class="heading">
+        <h1>MOTION CORE HILL ASSIST</h1>
+        <div class="sub">
+          v0.3 / iPhone Sensor Monitor
+        </div>
+      </div>
+    </div>
+  </header>
 
-<div class="panel">
-  <small>前後方向の相対傾斜</small>
-  <div class="value" id="pitch">-- °</div>
-  <small>参考勾配率</small>
-  <div class="value" id="grade">-- %</div>
+  <div class="controls">
+    <button id="startBtn"
+      class="btn-start"
+      onclick="startSensor()">
+      ▶ スタート
+    </button>
+
+    <button id="stopBtn"
+      class="btn-stop"
+      onclick="stopSensor()"
+      disabled>
+      ■ ストップ
+    </button>
+  </div>
+
+  <div class="grid">
+    <section class="card">
+      <h2>前後方向の相対傾斜</h2>
+      <div class="value" id="pitch">-- °</div>
+
+      <div class="unit-note">参考勾配率</div>
+      <div class="mini-value" id="grade">-- %</div>
+    </section>
+
+    <section class="card">
+      <h2>左右姿勢角</h2>
+      <div class="value" id="roll">-- °</div>
+
+      <div class="unit-note">
+        加速度ノルム（重力込み）
+      </div>
+      <div class="mini-value" id="accel">
+        -- m/s²
+      </div>
+    </section>
+  </div>
+
+  <section class="card status-box">
+    <div>
+      <h2>状態</h2>
+      <div class="status-pill" id="status">
+        計測待機中
+      </div>
+    </div>
+
+    <div class="count" id="count">
+      記録件数: 0
+    </div>
+  </section>
+
+  <button class="btn-sub" onclick="calibrate()">
+    ⚙ 現在の姿勢をゼロ校正
+  </button>
+
+  <button class="btn-sub2"
+    id="recordBtn"
+    onclick="toggleRecord()">
+    ⏺ CSV記録開始
+  </button>
+
+  <button class="btn-sub" onclick="saveCSV()">
+    ⬇ CSV保存
+  </button>
+
+  <div class="footer-note">
+    注意：参考計測用です。
+    車両制御には直接使用しないでください。
+    停車状態または安全な状態で確認してください。
+  </div>
+
 </div>
-
-<div class="panel">
-  <small>左右姿勢角</small>
-  <div class="value" id="roll">-- °</div>
-  <small>加速度ノルム（重力込み）</small>
-  <div class="value" id="accel">-- m/s²</div>
-</div>
-
-<div class="panel">
-  <small>状態</small>
-  <p id="status">計測待機中</p>
-  <small id="count">記録件数: 0</small>
-</div>
-
-<button id="start" onclick="startSensor()">
-センサー計測開始
-</button>
-<button onclick="calibrate()">
-現在の姿勢をゼロ校正
-</button>
-<button onclick="toggleRecord()" id="record">
-CSV記録開始
-</button>
-<button onclick="saveCSV()">
-CSV保存
-</button>
-
-<p><small>
-注意：参考計測用です。車両制御には使用しないでください。
-</small></p>
 
 <script>
+"use strict";
+
 let beta = null;
 let gamma = null;
 let zeroBeta = 0;
 let accelNorm = null;
+
+let sensorActive = false;
 let recording = false;
 let rows = [];
 let lastLog = 0;
-let started = false;
 
+const MAX_ROWS = 6000;
 const el = id => document.getElementById(id);
+
+function setStatus(message, mode) {
+  const status = el("status");
+  status.textContent = message;
+  status.className = "status-pill";
+
+  if (mode === "running") {
+    status.classList.add("running");
+  } else if (mode === "stopped") {
+    status.classList.add("stopped");
+  }
+}
 
 function angleDiff(a, b) {
   return ((a - b + 540) % 360) - 180;
 }
 
+function setButtons() {
+  el("startBtn").disabled = sensorActive;
+  el("stopBtn").disabled = !sensorActive;
+}
+
 async function startSensor() {
+  if (sensorActive) return;
+
   try {
-    const requests = [];
-
-    if (typeof DeviceOrientationEvent !== "undefined"
-      && typeof DeviceOrientationEvent.requestPermission === "function") {
-      requests.push(DeviceOrientationEvent.requestPermission());
+    if (typeof DeviceOrientationEvent === "undefined") {
+      throw new Error("姿勢センサーに対応していません");
     }
 
-    if (typeof DeviceMotionEvent !== "undefined"
-      && typeof DeviceMotionEvent.requestPermission === "function") {
-      requests.push(DeviceMotionEvent.requestPermission());
+    // iOSではボタン操作から権限を要求する
+    // 必要なセンサーについて順番に要求する
+    if (typeof DeviceOrientationEvent.requestPermission
+        === "function") {
+      const result =
+        await DeviceOrientationEvent.requestPermission();
+
+      if (result !== "granted") {
+        throw new Error("姿勢センサーが許可されませんでした");
+      }
     }
 
-    const results = await Promise.all(requests);
-    if (results.some(x => x !== "granted")) {
-      el("status").textContent = "センサー権限が許可されませんでした";
-      return;
+    if (typeof DeviceMotionEvent !== "undefined" &&
+        typeof DeviceMotionEvent.requestPermission
+        === "function") {
+      const result =
+        await DeviceMotionEvent.requestPermission();
+
+      if (result !== "granted") {
+        throw new Error("加速度センサーが許可されませんでした");
+      }
     }
 
-    if (!started) {
-      window.addEventListener("deviceorientation", onOrientation);
-      window.addEventListener("devicemotion", onMotion);
-      started = true;
-    }
+    sensorActive = true;
 
-    el("status").textContent = "計測中";
-    el("start").disabled = true;
+    window.addEventListener(
+      "deviceorientation", onOrientation
+    );
+    window.addEventListener(
+      "devicemotion", onMotion
+    );
 
-  } catch (e) {
-    el("status").textContent = "開始エラー: " + e.message;
+    setButtons();
+    setStatus("計測中", "running");
+
+  } catch (error) {
+    sensorActive = false;
+    setButtons();
+    setStatus(
+      "開始エラー: " + error.message, "stopped"
+    );
   }
 }
 
-function onOrientation(e) {
-  if (e.beta == null || e.gamma == null) return;
+function stopSensor() {
+  if (!sensorActive) return;
 
-  beta = e.beta;
-  gamma = e.gamma;
+  window.removeEventListener(
+    "deviceorientation", onOrientation
+  );
+  window.removeEventListener(
+    "devicemotion", onMotion
+  );
+
+  sensorActive = false;
+
+  // 計測停止時にはCSV記録も停止する
+  recording = false;
+  el("recordBtn").textContent = "⏺ CSV記録開始";
+
+  setButtons();
+  setStatus("計測停止中", "stopped");
+}
+
+function onOrientation(event) {
+  if (!sensorActive) return;
+
+  if (event.beta == null ||
+      event.gamma == null) {
+    return;
+  }
+
+  beta = event.beta;
+  gamma = event.gamma;
 
   const pitch = angleDiff(beta, zeroBeta);
-  const grade = 100 * Math.tan(pitch * Math.PI / 180);
+  const validGrade = Math.abs(pitch) < 80;
 
-  el("pitch").textContent = pitch.toFixed(2) + " °";
+  const grade = validGrade
+    ? 100 * Math.tan(pitch * Math.PI / 180)
+    : null;
+
+  el("pitch").textContent =
+    pitch.toFixed(2) + " °";
+
   el("grade").textContent =
-    Math.abs(pitch) < 80 ? grade.toFixed(1) + " %" : "--";
-  el("roll").textContent = gamma.toFixed(2) + " °";
+    grade === null
+      ? "-- %"
+      : grade.toFixed(1) + " %";
+
+  el("roll").textContent =
+    gamma.toFixed(2) + " °";
 
   const now = Date.now();
 
   if (recording && now - lastLog >= 100) {
     lastLog = now;
+
     rows.push([
       new Date(now).toISOString(),
       beta.toFixed(3),
       gamma.toFixed(3),
       pitch.toFixed(3),
-      grade.toFixed(3),
-      accelNorm == null ? "" : accelNorm.toFixed(3)
+      grade === null ? "" : grade.toFixed(3),
+      accelNorm === null
+        ? ""
+        : accelNorm.toFixed(3)
     ]);
-    el("count").textContent = "記録件数: " + rows.length;
 
-    if (rows.length >= 6000) {
+    el("count").textContent =
+      "記録件数: " + rows.length;
+
+    if (rows.length >= MAX_ROWS) {
       recording = false;
-      el("record").textContent = "CSV記録開始";
-      el("status").textContent = "記録上限。CSVを保存してください";
+      el("recordBtn").textContent =
+        "⏺ CSV記録開始";
+
+      setStatus(
+        "記録上限に到達。CSVを保存してください",
+        "running"
+      );
     }
   }
 }
 
-function onMotion(e) {
-  const a = e.accelerationIncludingGravity;
-  if (!a || a.x == null || a.y == null || a.z == null) return;
+function onMotion(event) {
+  if (!sensorActive) return;
+
+  const a = event.accelerationIncludingGravity;
+
+  if (!a ||
+      a.x == null ||
+      a.y == null ||
+      a.z == null) {
+    return;
+  }
 
   accelNorm = Math.hypot(a.x, a.y, a.z);
-  el("accel").textContent = accelNorm.toFixed(2) + " m/s²";
+
+  el("accel").textContent =
+    accelNorm.toFixed(2) + " m/s²";
 }
 
 function calibrate() {
-  if (beta === null) {
-    el("status").textContent = "先に計測を開始してください";
+  if (!sensorActive || beta === null) {
+    setStatus(
+      "先に計測を開始してください",
+      sensorActive ? "running" : "stopped"
+    );
     return;
   }
+
   zeroBeta = beta;
-  el("status").textContent = "ゼロ校正完了";
+
+  setStatus(
+    "ゼロ校正完了",
+    "running"
+  );
 }
 
 function toggleRecord() {
-  if (beta === null) {
-    el("status").textContent = "先に計測を開始してください";
+  if (!sensorActive || beta === null) {
+    setStatus(
+      "先に計測を開始してください",
+      sensorActive ? "running" : "stopped"
+    );
     return;
   }
+
+  if (!recording && rows.length >= MAX_ROWS) {
+    setStatus(
+      "CSVを保存後、記録を消去してください",
+      "running"
+    );
+    return;
+  }
+
   recording = !recording;
-  el("record").textContent =
-    recording ? "CSV記録停止" : "CSV記録開始";
+
+  el("recordBtn").textContent =
+    recording
+      ? "⏹ CSV記録停止"
+      : "⏺ CSV記録開始";
+
+  setStatus(
+    recording ? "CSV記録中" : "計測中",
+    "running"
+  );
 }
 
 function saveCSV() {
   if (!rows.length) {
-    el("status").textContent = "記録データがありません";
+    setStatus(
+      "記録データがありません",
+      sensorActive ? "running" : "stopped"
+    );
     return;
   }
 
-  const header =
-    "time,beta_deg,gamma_deg,relative_pitch_deg,grade_pct,accel_norm_mps2";
-  const csv = [header, ...rows.map(r => r.join(","))].join("\r\n");
-  const blob = new Blob([csv], {type:"text/csv;charset=utf-8"});
+  const header = [
+    "time",
+    "beta_deg",
+    "gamma_deg",
+    "relative_pitch_deg",
+    "grade_pct",
+    "accel_norm_mps2"
+  ].join(",");
+
+  const csv = [
+    header,
+    ...rows.map(row => row.join(","))
+  ].join("\r\n");
+
+  const blob = new Blob(
+    ["\uFEFF", csv],
+    { type: "text/csv;charset=utf-8" }
+  );
+
   const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
 
-  const a = document.createElement("a");
-  a.href = url;
-  a.download = "mibot_sensor.csv";
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
+  link.href = url;
+  link.download = "motioncore_hill_sensor.csv";
 
-  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+  }, 5000);
+
+  setStatus(
+    "CSV保存操作を実行しました",
+    sensorActive ? "running" : "stopped"
+  );
 }
+
+// 画面を離れる際、記録を停止する
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && sensorActive) {
+    stopSensor();
+  }
+});
+
+setButtons();
 </script>
 </body>
 </html>
