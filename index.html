@@ -3,46 +3,45 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport"
+ content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#c7f8e2">
-<title>MOTION CORE HILL ASSIST</title>
+<title>MOTION CORE HILL ASSIST v0.5</title>
 <style>
 *{box-sizing:border-box}
 body{
  margin:0;padding:16px 13px 30px;
+ min-height:100vh;
  font-family:-apple-system,BlinkMacSystemFont,sans-serif;
  color:#20382b;
  background:linear-gradient(140deg,#ddffec,#b8efd6,#eafff3);
- min-height:100vh;
 }
 .wrap{max-width:720px;margin:auto}
 .hero,.card{
- background:white;
- border:2px solid #b8e8d0;
- border-radius:22px;
- padding:16px;
- margin-bottom:12px;
+ background:white;border:2px solid #b8e8d0;
+ border-radius:22px;padding:16px;margin-bottom:12px;
  box-shadow:0 6px 20px #42775818;
 }
 .hero{background:linear-gradient(120deg,#fff7d7,#fff,#ecfff4)}
 .head{display:flex;align-items:center;gap:8px}
 .logo{
- width:80px;height:80px;object-fit:contain;
- background:white;border-radius:16px;padding:2px;
- flex-shrink:0;
+ width:80px;height:80px;flex-shrink:0;
+ object-fit:contain;background:white;
+ border-radius:16px;padding:2px;
 }
 .headtext{flex:1;min-width:0}
 h1{
- margin:0;
- font-size:clamp(10px,2.65vw,19px);
- white-space:nowrap;letter-spacing:-.4px;
+ margin:0;font-size:clamp(10px,2.65vw,19px);
+ white-space:nowrap;letter-spacing:-.4px;font-weight:800;
 }
 .sub{font-size:12px;color:#64806f;margin-top:5px}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.controls{
+ display:grid;grid-template-columns:1fr 1fr;gap:10px;
+}
 button{
  border:0;border-radius:16px;padding:14px 9px;
  font-size:16px;font-weight:bold;width:100%;
- margin-bottom:10px;
+ margin-bottom:10px;cursor:pointer;
 }
 button:disabled{opacity:.45}
 .start{background:#3cdb92;color:#14402c}
@@ -50,8 +49,14 @@ button:disabled{opacity:.45}
 .yellow{background:#ffe77a;color:#5a4600}
 .blue{background:#9cddff;color:#15445c}
 h2{font-size:15px;color:#60796a;margin:0 0 8px}
-.big{font-size:41px;font-weight:800;line-height:1.2}
-.smallbig{font-size:27px;font-weight:800;margin-top:6px}
+.big{
+ font-size:41px;font-weight:800;line-height:1.2;
+ font-variant-numeric:tabular-nums;
+}
+.smallbig{
+ font-size:27px;font-weight:800;margin-top:6px;
+ font-variant-numeric:tabular-nums;
+}
 .note{font-size:12px;color:#637b6c;line-height:1.6}
 .sep{height:1px;background:#d9eee2;margin:13px 0}
 .torque{
@@ -62,9 +67,8 @@ h2{font-size:15px;color:#60796a;margin:0 0 8px}
 .torque .smallbig{color:#21865b}
 .grid{display:grid;gap:12px;grid-template-columns:1fr}
 .status{
- display:inline-block;border-radius:100px;
- padding:10px 15px;background:#edf1ef;
- color:#627568;font-weight:800;
+ display:inline-block;border-radius:100px;padding:10px 15px;
+ background:#edf1ef;color:#627568;font-weight:800;
  border:2px solid #d7e2db;
 }
 .status.running{
@@ -79,19 +83,31 @@ label{
  display:block;font-size:13px;font-weight:bold;
  color:#526b5c;margin-bottom:5px;
 }
-input{
- width:100%;padding:12px;
- font-size:16px;border:1px solid #b8dac7;
- border-radius:11px;background:#fafffc;
+input,select{
+ width:100%;padding:12px;font-size:16px;
+ border:1px solid #b8dac7;border-radius:11px;
+ background:#fafffc;color:#20382b;
 }
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fields{
+ display:grid;grid-template-columns:1fr 1fr;gap:12px;
+}
 .warning{
  background:#fff5d9;color:#795b20;
  padding:11px;border-radius:12px;
  font-size:12px;line-height:1.6;margin-top:10px;
 }
-#count{font-size:13px;color:#637b6c;margin-top:10px}
+#count{
+ font-size:13px;color:#637b6c;margin-top:10px;
+}
 .footer{font-size:12px;color:#637b6c;line-height:1.7}
+.period-box{
+ background:#eefcf5;border-radius:14px;
+ padding:13px;margin-top:10px;
+}
+.period-value{
+ color:#07894e;font-size:21px;font-weight:800;
+ margin-top:8px;
+}
 @media(min-width:700px){
  .grid{grid-template-columns:1fr 1fr}
 }
@@ -101,6 +117,7 @@ input{
 }
 </style>
 </head>
+
 <body>
 <div class="wrap">
 
@@ -109,14 +126,18 @@ input{
   <img src="logo.png" class="logo" alt="MOTION CORE">
   <div class="headtext">
    <h1>MOTION CORE HILL ASSIST</h1>
-   <div class="sub">v0.4 / iPhone Sensor Torque Monitor</div>
+   <div class="sub">
+    v0.5 / iPhone Sensor Torque Monitor
+   </div>
   </div>
  </div>
 </header>
 
 <div class="controls">
- <button id="startBtn" class="start" onclick="startSensor()">▶ スタート</button>
- <button id="stopBtn" class="stop" onclick="stopSensor()" disabled>■ ストップ</button>
+ <button id="startBtn" class="start"
+  onclick="startSensor()">▶ スタート</button>
+ <button id="stopBtn" class="stop"
+  onclick="stopSensor()" disabled>■ ストップ</button>
 </div>
 
 <div class="grid">
@@ -126,6 +147,7 @@ input{
   <div class="note">iPhoneから取得した参考勾配率</div>
   <div id="grade" class="smallbig">-- %</div>
  </section>
+
  <section class="card">
   <h2>左右姿勢角</h2>
   <div id="roll" class="big">-- °</div>
@@ -136,241 +158,676 @@ input{
 
 <section class="card torque">
  <h2>HILL HOLD 理論必要トルク</h2>
+
  <div class="note">必要タイヤトルク（駆動輪合計）</div>
- <div class="big" id="wheelTorque">-- Nm</div>
+ <div id="wheelTorque" class="big">-- Nm</div>
+
  <div class="sep"></div>
  <div class="note">必要モータートルク（概算）</div>
- <div class="smallbig" id="motorTorque">-- Nm</div>
+ <div id="motorTorque" class="smallbig">-- Nm</div>
+
  <div class="sep"></div>
  <div class="note">演算に使用したセンサー勾配</div>
- <div class="smallbig" id="usedGrade">-- %</div>
- <p class="note" id="torqueInfo">センサー計測と水平校正が必要です</p>
+ <div id="usedGrade" class="smallbig">-- %</div>
+
+ <p id="torqueInfo" class="note">
+  センサー計測と水平校正が必要です
+ </p>
+</section>
+
+<section class="card">
+ <h2>更新周期設定</h2>
+
+ <label for="displayPeriod">
+  画面の表示更新周期
+ </label>
+
+ <select id="displayPeriod" onchange="changePeriod()">
+  <option value="100">100 ms（高速・10 Hz）</option>
+  <option value="250" selected>250 ms（標準・4 Hz）</option>
+  <option value="500">500 ms（安定・2 Hz）</option>
+  <option value="1000">1000 ms（低速・1 Hz）</option>
+ </select>
+
+ <div class="period-box">
+  <div class="note">現在の表示周期</div>
+  <div id="periodLabel" class="period-value">
+   250 ms / 4 Hz
+  </div>
+ </div>
+
+ <div class="note" style="margin-top:10px">
+  トルク演算：100 ms（固定）<br>
+  CSV記録：100 ms（固定）<br>
+  勾配LPF時定数：0.3 秒（固定）
+ </div>
 </section>
 
 <section class="card">
  <h2>車両スペック設定</h2>
+
  <div class="fields">
   <div>
    <label for="mass">車両質量 [kg]</label>
    <input id="mass" type="number" value="430"
-    min="1" step="1" oninput="recalculate()">
+    min="1" step="1" oninput="onParameterChange()">
   </div>
   <div>
    <label for="payload">乗員・積載 [kg]</label>
    <input id="payload" type="number" value="70"
-    min="0" step="1" oninput="recalculate()">
+    min="0" step="1" oninput="onParameterChange()">
   </div>
   <div>
    <label for="radius">タイヤ有効半径 [m]</label>
    <input id="radius" type="number" value="0.254"
-    min="0.01" step="0.001" oninput="recalculate()">
+    min="0.01" step="0.001" oninput="onParameterChange()">
   </div>
   <div>
    <label for="ratio">減速比</label>
    <input id="ratio" type="number" value="11"
-    min="0.1" step="0.1" oninput="recalculate()">
+    min="0.1" step="0.1" oninput="onParameterChange()">
   </div>
   <div style="grid-column:1/-1">
    <label for="eff">駆動系効率（0～1）</label>
    <input id="eff" type="number" value="0.95"
     min="0.01" max="1" step="0.01"
-    oninput="recalculate()">
+    oninput="onParameterChange()">
   </div>
  </div>
+
  <div class="sep"></div>
- <div id="massInfo" class="note">総質量：500 kg</div>
+ <div id="massInfo" class="note">
+  総質量：500 kg
+ </div>
 </section>
 
 <section class="card">
  <h2>計測状態</h2>
+
  <div id="status" class="status">計測待機中</div>
  <div id="count">記録件数: 0</div>
- <div class="note" id="calState">水平基準：未校正</div>
+ <div id="calState" class="note">
+  水平基準：未校正
+ </div>
+
  <div class="warning">
-  水平校正は、iPhoneを車体に固定し、車両を既知の水平面に置いて実施してください。
-  坂道で校正した場合、路面の絶対勾配は求まりません。
+  水平校正は、iPhoneを車体に固定し、
+  車両を既知の水平面に置いて実施してください。
+  坂道で校正すると、その坂道が0%になります。
  </div>
 </section>
 
 <button class="yellow" onclick="calibrate()">
  ⚙ 水平面でゼロ校正
 </button>
-<button class="blue" id="recordBtn" onclick="toggleRecord()">
+
+<button class="blue" id="recordBtn"
+ onclick="toggleRecord()">
  ⏺ CSV記録開始
 </button>
+
 <button class="yellow" onclick="saveCSV()">
  ⬇ CSV保存
 </button>
+
 <button class="blue" onclick="clearCSV()">
  🗑 記録データを消去
 </button>
 
 <div class="footer">
  本アプリは研究・評価用です。
- センサー勾配は端末姿勢に基づく参考値です。
- トルクは重力釣合いの理論値であり、
- 実車の保持制御や安全判断には使用しないでください。
+ 勾配はiPhoneの相対姿勢に基づく参考値であり、
+ 実車の保持トルク指令や安全判断には使用しないでください。
 </div>
+
 </div>
 
 <script>
 "use strict";
 
-const el = id => document.getElementById(id);
-const G = 9.80665;
+// ------------------------------------
+// Timing configuration
+// ------------------------------------
+const CALC_MS = 100;
+const LOG_MS = 100;
+const FILTER_TAU = 0.3;
+const SENSOR_TIMEOUT_MS = 1500;
 const MAX_ROWS = 6000;
+const G = 9.80665;
 
+const PERIOD_OPTIONS = [100,250,500,1000];
+const PERIOD_STORAGE_KEY = "motioncore_display_ms";
+
+const el = id => document.getElementById(id);
+
+let displayMs = 250;
+let calcTimer = null;
+let logTimer = null;
+let displayTimer = null;
+
+// ------------------------------------
+// Sensor and calculation state
+// ------------------------------------
 let active = false;
 let recording = false;
 let calibrated = false;
+
+let beta = null;
+let gamma = null;
 let zeroBeta = 0;
-let beta = null, gamma = null;
-let pitch = null, grade = null;
+
+let rawPitch = null;
+let filteredPitch = null;
+let pitch = null;
+let grade = null;
+
 let accelNorm = null;
-let wheelTorque = null, motorTorque = null;
+let wheelTorque = null;
+let motorTorque = null;
+
 let gyro = {x:null,y:null,z:null};
 let linearAcc = {x:null,y:null,z:null};
-let rows = [], lastLog = 0;
-let calibrationStale = false;
+
+let lastOrientationTime = null;
+let lastMotionTime = null;
+let lastFilterTime = null;
+
+let rows = [];
 
 function readNumber(id) {
  const s = el(id).value.trim();
  return s === "" ? NaN : Number(s);
 }
 
-function setStatus(message, mode) {
- el("status").textContent = message;
- el("status").className =
-   "status" + (mode ? " " + mode : "");
+function numeric(v,d=2) {
+ return v === null || !Number.isFinite(v)
+  ? "--" : v.toFixed(d);
 }
 
-function buttons() {
- el("startBtn").disabled = active;
- el("stopBtn").disabled = !active;
+function csvNum(v,d=4) {
+ return v === null || !Number.isFinite(v)
+  ? "" : v.toFixed(d);
 }
 
 function diffAngle(a,b) {
  return ((a-b+540)%360)-180;
 }
 
-function updateDisplay() {
- el("pitch").textContent =
-   pitch === null ? "-- °" : pitch.toFixed(2)+" °";
- el("roll").textContent =
-   gamma === null ? "-- °" : gamma.toFixed(2)+" °";
- el("grade").textContent =
-   grade === null ? "-- %" : grade.toFixed(2)+" %";
- el("accel").textContent =
-   accelNorm === null ? "-- m/s²" :
-   accelNorm.toFixed(2)+" m/s²";
+function setStatus(message,mode) {
+ el("status").textContent = message;
+ el("status").className =
+  "status" + (mode ? " "+mode : "");
 }
 
-function recalculate() {
+function updateButtons() {
+ el("startBtn").disabled = active;
+ el("stopBtn").disabled = !active;
+}
+
+function sensorFresh() {
+ return active &&
+  lastOrientationTime !== null &&
+  performance.now()-lastOrientationTime
+    <= SENSOR_TIMEOUT_MS;
+}
+
+function motionFresh() {
+ return active &&
+  lastMotionTime !== null &&
+  performance.now()-lastMotionTime
+    <= SENSOR_TIMEOUT_MS;
+}
+
+function vehicleParameters() {
  const mass = readNumber("mass");
  const payload = readNumber("payload");
  const radius = readNumber("radius");
  const ratio = readNumber("ratio");
- const eff = readNumber("eff");
- const total = mass + payload;
+ const efficiency = readNumber("eff");
 
- const valid = Number.isFinite(total) &&
-   mass > 0 && payload >= 0 &&
-   radius > 0 && ratio > 0 &&
-   eff > 0 && eff <= 1;
+ const valid =
+  Number.isFinite(mass) &&
+  Number.isFinite(payload) &&
+  Number.isFinite(radius) &&
+  Number.isFinite(ratio) &&
+  Number.isFinite(efficiency) &&
+  mass > 0 &&
+  payload >= 0 &&
+  radius > 0 &&
+  ratio > 0 &&
+  efficiency > 0 &&
+  efficiency <= 1;
 
- el("massInfo").textContent = valid
-   ? "総質量："+total.toFixed(1)+" kg"
-   : "車両スペックを確認してください";
-
- // Do not calculate from an uncalibrated
- // or stopped sensor.
- if (!valid || !active || !calibrated ||
-     grade === null) {
-   wheelTorque = null;
-   motorTorque = null;
-   el("wheelTorque").textContent = "-- Nm";
-   el("motorTorque").textContent = "-- Nm";
-   el("usedGrade").textContent = "-- %";
-   el("torqueInfo").textContent = !valid
-     ? "車両スペックが不正です"
-     : !calibrated
-     ? "水平面でゼロ校正してください"
-     : "有効なセンサーデータがありません";
-   return;
- }
-
- // Slope percent -> sin(theta)
- const slope = grade / 100;
- const sinTheta =
-   slope / Math.sqrt(1+slope*slope);
-
- // Gravity balancing torque magnitude
- wheelTorque =
-   total * G * radius * Math.abs(sinTheta);
-
- motorTorque =
-   wheelTorque / (ratio * eff);
-
- el("wheelTorque").textContent =
-   wheelTorque.toFixed(1)+" Nm";
- el("motorTorque").textContent =
-   motorTorque.toFixed(1)+" Nm";
- el("usedGrade").textContent =
-   grade.toFixed(2)+" %";
- el("torqueInfo").textContent =
-   "iPhone相対姿勢に基づく参考演算";
+ return {
+  valid,
+  mass,
+  payload,
+  radius,
+  ratio,
+  efficiency,
+  totalMass:mass+payload
+ };
 }
 
+// ------------------------------------
+// Sensor event callbacks
+// ------------------------------------
+function onOrientation(event) {
+ if (!active) return;
+ if (!Number.isFinite(event.beta) ||
+     !Number.isFinite(event.gamma)) return;
+
+ beta = event.beta;
+ gamma = event.gamma;
+
+ const now = performance.now();
+ const gap = lastOrientationTime === null
+  ? null : now-lastOrientationTime;
+
+ lastOrientationTime = now;
+
+ if (!calibrated) return;
+
+ rawPitch = diffAngle(beta,zeroBeta);
+
+ if (filteredPitch === null ||
+     lastFilterTime === null ||
+     gap === null ||
+     gap > SENSOR_TIMEOUT_MS) {
+
+  filteredPitch = rawPitch;
+
+ } else {
+
+  const dt = Math.max(
+   0,(now-lastFilterTime)/1000
+  );
+
+  const alpha = 1-Math.exp(-dt/FILTER_TAU);
+
+  const error =
+   diffAngle(rawPitch,filteredPitch);
+
+  filteredPitch = diffAngle(
+   filteredPitch+alpha*error,0
+  );
+ }
+
+ lastFilterTime = now;
+}
+
+function onMotion(event) {
+ if (!active) return;
+
+ lastMotionTime = performance.now();
+
+ const a = event.accelerationIncludingGravity;
+
+ accelNorm = (
+  a && Number.isFinite(a.x) &&
+  Number.isFinite(a.y) &&
+  Number.isFinite(a.z)
+ )
+  ? Math.hypot(a.x,a.y,a.z)
+  : null;
+
+ const r = event.rotationRate;
+ gyro = {
+  x:Number.isFinite(r?.beta) ? r.beta : null,
+  y:Number.isFinite(r?.gamma) ? r.gamma : null,
+  z:Number.isFinite(r?.alpha) ? r.alpha : null
+ };
+
+ const lin = event.acceleration;
+ linearAcc = {
+  x:Number.isFinite(lin?.x) ? lin.x : null,
+  y:Number.isFinite(lin?.y) ? lin.y : null,
+  z:Number.isFinite(lin?.z) ? lin.z : null
+ };
+}
+
+// ------------------------------------
+// Torque calculation: 100 ms
+// ------------------------------------
+function calculateTask() {
+ const p = vehicleParameters();
+
+ if (!p.valid ||
+     !calibrated ||
+     !sensorFresh() ||
+     filteredPitch === null) {
+
+  pitch = null;
+  grade = null;
+  wheelTorque = null;
+  motorTorque = null;
+  return;
+ }
+
+ pitch = filteredPitch;
+
+ if (Math.abs(pitch) >= 45) {
+  grade = null;
+  wheelTorque = null;
+  motorTorque = null;
+  return;
+ }
+
+ const theta = pitch*Math.PI/180;
+
+ grade = 100*Math.tan(theta);
+
+ const force =
+  p.totalMass*G*Math.abs(Math.sin(theta));
+
+ wheelTorque = force*p.radius;
+
+ motorTorque =
+  wheelTorque/(p.ratio*p.efficiency);
+}
+
+// ------------------------------------
+// Display: selectable interval
+// ------------------------------------
+function displayTask() {
+ const fresh = sensorFresh();
+ const mfresh = motionFresh();
+
+ el("pitch").textContent =
+  numeric(pitch)+" °";
+
+ el("grade").textContent =
+  numeric(grade)+" %";
+
+ el("roll").textContent =
+  fresh ? numeric(gamma)+" °" : "-- °";
+
+ el("accel").textContent =
+  mfresh ? numeric(accelNorm)+" m/s²" : "-- m/s²";
+
+ el("wheelTorque").textContent =
+  numeric(wheelTorque,1)+" Nm";
+
+ el("motorTorque").textContent =
+  numeric(motorTorque,1)+" Nm";
+
+ el("usedGrade").textContent =
+  numeric(grade)+" %";
+
+ const p = vehicleParameters();
+
+ el("massInfo").textContent =
+  p.valid
+   ? "総質量："+p.totalMass.toFixed(1)+" kg"
+   : "車両スペックを確認してください";
+
+ el("count").textContent =
+  "記録件数: "+rows.length;
+
+ if (!p.valid) {
+  el("torqueInfo").textContent =
+   "車両スペックが不正です";
+ } else if (!calibrated) {
+  el("torqueInfo").textContent =
+   "水平面でゼロ校正してください";
+ } else if (!fresh) {
+  el("torqueInfo").textContent =
+   "センサー更新待ち、または計測停止中";
+ } else if (wheelTorque === null) {
+  el("torqueInfo").textContent =
+   "有効な傾斜値がありません";
+ } else {
+  el("torqueInfo").textContent =
+   "LPF処理後のiPhone相対姿勢から演算";
+ }
+}
+
+// ------------------------------------
+// Display period setting
+// ------------------------------------
+function changePeriod() {
+ const requested = Number(
+  el("displayPeriod").value
+ );
+
+ displayMs = PERIOD_OPTIONS.includes(requested)
+  ? requested : 250;
+
+ el("displayPeriod").value =
+  String(displayMs);
+
+ el("periodLabel").textContent =
+  displayMs+" ms / "+
+  (1000/displayMs).toFixed(
+   Number.isInteger(1000/displayMs)?0:1
+  )+" Hz";
+
+ try {
+  localStorage.setItem(
+   PERIOD_STORAGE_KEY,String(displayMs)
+  );
+ } catch(e) {
+  // Continue without persistence.
+ }
+
+ if (displayTimer !== null) {
+  clearInterval(displayTimer);
+  displayTimer = setInterval(
+   displayTask,displayMs
+  );
+ }
+
+ // Show the new setting immediately.
+ displayTask();
+}
+
+function loadPeriod() {
+ let saved = null;
+ try {
+  saved = Number(
+   localStorage.getItem(PERIOD_STORAGE_KEY)
+  );
+ } catch(e) {}
+
+ el("displayPeriod").value = String(
+  PERIOD_OPTIONS.includes(saved) ? saved : 250
+ );
+
+ changePeriod();
+}
+
+function onParameterChange() {
+ // Recalculate immediately after user changes
+ // a vehicle parameter; timed task continues.
+ calculateTask();
+ displayTask();
+}
+
+// ------------------------------------
+// CSV logging: 100 ms
+// ------------------------------------
+function loggingTask() {
+ if (!active || !recording) return;
+
+ if (rows.length >= MAX_ROWS) {
+  stopRecording();
+  setStatus(
+   "記録上限。CSVを保存してください",
+   "running"
+  );
+  return;
+ }
+
+ const p = vehicleParameters();
+ const orientationValid =
+  calibrated && sensorFresh();
+
+ rows.push([
+  new Date().toISOString(),
+
+  csvNum(orientationValid ? beta : null),
+  csvNum(orientationValid ? gamma : null),
+
+  csvNum(orientationValid ? rawPitch : null),
+  csvNum(orientationValid ? filteredPitch : null),
+  csvNum(pitch),
+  csvNum(grade),
+
+  csvNum(wheelTorque),
+  csvNum(motorTorque),
+
+  csvNum(motionFresh() ? accelNorm : null),
+
+  csvNum(motionFresh() ? gyro.x : null),
+  csvNum(motionFresh() ? gyro.y : null),
+  csvNum(motionFresh() ? gyro.z : null),
+
+  csvNum(motionFresh() ? linearAcc.x : null),
+  csvNum(motionFresh() ? linearAcc.y : null),
+  csvNum(motionFresh() ? linearAcc.z : null),
+
+  csvNum(p.mass),
+  csvNum(p.payload),
+  csvNum(p.radius),
+  csvNum(p.ratio),
+  csvNum(p.efficiency),
+
+  orientationValid ? 1 : 0,
+  displayMs
+ ]);
+
+ if (rows.length >= MAX_ROWS) {
+  stopRecording();
+  setStatus(
+   "記録上限。CSVを保存してください",
+   "running"
+  );
+ }
+}
+
+// ------------------------------------
+// Timers
+// ------------------------------------
+function startTasks() {
+ stopTasks();
+
+ calcTimer = setInterval(
+  calculateTask,CALC_MS
+ );
+
+ displayTimer = setInterval(
+  displayTask,displayMs
+ );
+
+ logTimer = setInterval(
+  loggingTask,LOG_MS
+ );
+}
+
+function stopTasks() {
+ if (calcTimer !== null) {
+  clearInterval(calcTimer);
+  calcTimer = null;
+ }
+
+ if (displayTimer !== null) {
+  clearInterval(displayTimer);
+  displayTimer = null;
+ }
+
+ if (logTimer !== null) {
+  clearInterval(logTimer);
+  logTimer = null;
+ }
+}
+
+// ------------------------------------
+// Start and Stop
+// ------------------------------------
 async function startSensor() {
  if (active) return;
 
  try {
-   if (!window.isSecureContext) {
-     throw Error("HTTPSで開いてください");
-   }
-   if (typeof DeviceOrientationEvent === "undefined") {
-     throw Error("姿勢センサーを利用できません");
-   }
+  if (!window.isSecureContext) {
+   throw Error("HTTPSで開いてください");
+  }
 
-   // Both requests start directly from the tap.
-   const permissions = [];
-   if (typeof DeviceOrientationEvent.requestPermission
-       === "function") {
-     permissions.push(
-       DeviceOrientationEvent.requestPermission()
-     );
-   }
-   if (typeof DeviceMotionEvent !== "undefined" &&
-       typeof DeviceMotionEvent.requestPermission
-       === "function") {
-     permissions.push(
-       DeviceMotionEvent.requestPermission()
-     );
-   }
+  if (typeof DeviceOrientationEvent ===
+      "undefined") {
+   throw Error("姿勢センサーが利用できません");
+  }
 
-   const results = await Promise.all(permissions);
-   if (results.some(p => p !== "granted")) {
-     throw Error("センサー使用が許可されませんでした");
-   }
+  const requests = [];
 
-   active = true;
-   beta = null;
-   gamma = null;
-   pitch = null;
-   grade = null;
-   accelNorm = null;
+  if (typeof DeviceOrientationEvent
+      .requestPermission === "function") {
+   requests.push(
+    DeviceOrientationEvent.requestPermission()
+   );
+  }
 
-   window.addEventListener(
-     "deviceorientation",onOrientation);
-   window.addEventListener(
-     "devicemotion",onMotion);
+  if (typeof DeviceMotionEvent !==
+      "undefined" &&
+      typeof DeviceMotionEvent
+      .requestPermission === "function") {
+   requests.push(
+    DeviceMotionEvent.requestPermission()
+   );
+  }
 
-   buttons();
-   updateDisplay();
-   recalculate();
-   setStatus("計測中","running");
- } catch(error) {
-   setStatus("開始エラー："+error.message,"error");
+  const result = await Promise.all(requests);
+
+  if (result.some(x=>x!=="granted")) {
+   throw Error("センサー利用が許可されませんでした");
+  }
+
+  active = true;
+  recording = false;
+  calibrated = false;
+
+  beta = null;
+  gamma = null;
+  zeroBeta = 0;
+  rawPitch = null;
+  filteredPitch = null;
+  pitch = null;
+  grade = null;
+  accelNorm = null;
+  wheelTorque = null;
+  motorTorque = null;
+
+  lastOrientationTime = null;
+  lastMotionTime = null;
+  lastFilterTime = null;
+
+  gyro = {x:null,y:null,z:null};
+  linearAcc = {x:null,y:null,z:null};
+
+  el("calState").textContent =
+   "水平基準：未校正";
+
+  window.addEventListener(
+   "deviceorientation",onOrientation
+  );
+  window.addEventListener(
+   "devicemotion",onMotion
+  );
+
+  startTasks();
+  updateButtons();
+  displayTask();
+
+  setStatus(
+   "計測中・水平校正待ち","running"
+  );
+
+ } catch(e) {
+  active = false;
+  stopTasks();
+  updateButtons();
+  setStatus(
+   "開始エラー："+e.message,"error"
+  );
  }
 }
 
@@ -378,214 +835,208 @@ function stopSensor() {
  if (!active) return;
 
  window.removeEventListener(
-   "deviceorientation",onOrientation);
+  "deviceorientation",onOrientation
+ );
  window.removeEventListener(
-   "devicemotion",onMotion);
+  "devicemotion",onMotion
+ );
+
+ stopTasks();
 
  active = false;
  recording = false;
- el("recordBtn").textContent = "⏺ CSV記録開始";
- buttons();
+
+ stopRecording();
+
+ pitch = null;
+ grade = null;
+ wheelTorque = null;
+ motorTorque = null;
+ accelNorm = null;
+
+ updateButtons();
+ displayTask();
  setStatus("計測停止中","stopped");
-
- // Avoid displaying stale torque as live.
- recalculate();
 }
 
-function onOrientation(event) {
- if (!active ||
-     event.beta == null ||
-     event.gamma == null) return;
-
- beta = event.beta;
- gamma = event.gamma;
-
- if (calibrated) {
-   pitch = diffAngle(beta,zeroBeta);
-
-   // Suppress singular / large-angle results.
-   grade = Math.abs(pitch) < 45
-     ? 100*Math.tan(pitch*Math.PI/180)
-     : null;
- } else {
-   pitch = null;
-   grade = null;
- }
-
- updateDisplay();
- recalculate();
-}
-
-function onMotion(event) {
- if (!active) return;
-
- const a = event.accelerationIncludingGravity;
- if (a && a.x != null &&
-     a.y != null && a.z != null) {
-   accelNorm = Math.hypot(a.x,a.y,a.z);
- }
-
- const r = event.rotationRate;
- gyro = {
-   x:r?.beta ?? null,
-   y:r?.gamma ?? null,
-   z:r?.alpha ?? null
- };
-
- const aa = event.acceleration;
- linearAcc = {
-   x:aa?.x ?? null,
-   y:aa?.y ?? null,
-   z:aa?.z ?? null
- };
-
- updateDisplay();
-
- const now = Date.now();
- if (recording && now-lastLog >= 100) {
-   lastLog = now;
-   addLog(now);
- }
-}
-
+// ------------------------------------
+// Calibration
+// ------------------------------------
 function calibrate() {
- if (!active || beta === null) {
-   setStatus("計測開始後に校正してください",
-     active?"running":"stopped");
-   return;
+ if (!active ||
+     !sensorFresh() ||
+     beta === null) {
+
+  setStatus(
+   "センサー取得後に校正してください",
+   active ? "running" : "stopped"
+  );
+  return;
  }
 
  if (!confirm(
-   "車両は既知の水平面にあり、iPhoneは車体に固定されていますか？"
+  "車両は既知の水平面にあり、"+
+  "iPhoneは車体に固定されていますか？"
  )) return;
 
  zeroBeta = beta;
  calibrated = true;
- calibrationStale = false;
+
+ rawPitch = 0;
+ filteredPitch = 0;
+ lastFilterTime = performance.now();
+
+ calculateTask();
+ displayTask();
 
  el("calState").textContent =
-   "水平基準：校正済み（この起動中のみ有効）";
+  "水平基準：校正済み（今回の計測のみ）";
 
- pitch = 0;
- grade = 0;
- updateDisplay();
- recalculate();
- setStatus("水平ゼロ校正完了","running");
+ setStatus(
+  "水平ゼロ校正完了","running"
+ );
 }
 
-function n(v) {
- return v !== null && Number.isFinite(v)
-   ? v.toFixed(4) : "";
-}
-
-function addLog(t) {
- rows.push([
-   new Date(t).toISOString(),
-   n(beta),n(gamma),
-   n(pitch),n(grade),
-   n(wheelTorque),n(motorTorque),
-   n(accelNorm),
-   n(gyro.x),n(gyro.y),n(gyro.z),
-   n(linearAcc.x),n(linearAcc.y),n(linearAcc.z),
-   readNumber("mass"),readNumber("payload"),
-   readNumber("radius"),readNumber("ratio"),
-   readNumber("eff")
- ]);
-
- el("count").textContent =
-   "記録件数: "+rows.length;
-
- if (rows.length >= MAX_ROWS) {
-   recording = false;
-   el("recordBtn").textContent =
-     "⏺ CSV記録開始";
-   setStatus("記録上限。CSVを保存してください",
-     "running");
- }
+// ------------------------------------
+// CSV operations
+// ------------------------------------
+function stopRecording() {
+ recording = false;
+ el("recordBtn").textContent =
+  "⏺ CSV記録開始";
 }
 
 function toggleRecord() {
  if (!active || !calibrated) {
-   setStatus("計測開始と水平校正が必要です",
-     active?"running":"stopped");
-   return;
+  setStatus(
+   "計測開始と水平校正が必要です",
+   active ? "running" : "stopped"
+  );
+  return;
  }
+
  if (!recording && rows.length >= MAX_ROWS) {
-   setStatus("記録上限です。CSV保存後に消去してください",
-     "running");
-   return;
+  setStatus(
+   "記録上限。CSV保存後に消去してください",
+   "running"
+  );
+  return;
  }
 
  recording = !recording;
- el("recordBtn").textContent = recording
+
+ el("recordBtn").textContent =
+  recording
    ? "⏹ CSV記録停止"
    : "⏺ CSV記録開始";
- setStatus(recording?"CSV記録中":"計測中",
-   "running");
+
+ setStatus(
+  recording ? "CSV記録中" : "計測中",
+  "running"
+ );
 }
 
 function saveCSV() {
  if (!rows.length) {
-   setStatus("記録データがありません",
-     active?"running":"stopped");
-   return;
+  setStatus(
+   "記録データがありません",
+   active ? "running" : "stopped"
+  );
+  return;
  }
 
  const header = [
-   "time","beta_deg","gamma_deg",
-   "relative_pitch_deg","sensor_grade_pct",
-   "wheel_torque_Nm","motor_torque_Nm",
-   "accel_norm_mps2",
-   "gyro_x_degps","gyro_y_degps","gyro_z_degps",
-   "linear_acc_x_mps2","linear_acc_y_mps2",
-   "linear_acc_z_mps2",
-   "vehicle_mass_kg","payload_mass_kg",
-   "tire_radius_m","gear_ratio","efficiency"
+  "time",
+  "beta_deg",
+  "gamma_deg",
+  "raw_pitch_deg",
+  "filtered_pitch_deg",
+  "pitch_deg",
+  "grade_pct",
+  "wheel_torque_Nm",
+  "motor_torque_Nm",
+  "accel_norm_mps2",
+  "gyro_x_degps",
+  "gyro_y_degps",
+  "gyro_z_degps",
+  "linear_acc_x_mps2",
+  "linear_acc_y_mps2",
+  "linear_acc_z_mps2",
+  "vehicle_mass_kg",
+  "payload_mass_kg",
+  "tire_radius_m",
+  "gear_ratio",
+  "efficiency",
+  "sensor_valid",
+  "display_period_ms"
  ];
 
  const csv = [
-   header.join(","),
-   ...rows.map(r=>r.join(","))
+  header.join(","),
+  ...rows.map(r=>r.join(","))
  ].join("\r\n");
 
  const blob = new Blob(
-   ["\uFEFF",csv],
-   {type:"text/csv;charset=utf-8"}
+  ["\uFEFF",csv],
+  {type:"text/csv;charset=utf-8"}
  );
+
  const url = URL.createObjectURL(blob);
  const a = document.createElement("a");
+
  a.href = url;
- a.download = "motioncore_hill_v04.csv";
+ a.download = "motioncore_hill_v05.csv";
+
  document.body.appendChild(a);
  a.click();
  a.remove();
+
  setTimeout(()=>URL.revokeObjectURL(url),5000);
 
- setStatus("CSV保存操作を実行しました",
-   active?"running":"stopped");
+ setStatus(
+  "CSV保存操作を実行しました",
+  active ? "running" : "stopped"
+ );
 }
 
 function clearCSV() {
  if (recording) {
-   setStatus("記録停止後に消去してください","running");
-   return;
+  setStatus(
+   "記録停止後に消去してください",
+   "running"
+  );
+  return;
  }
+
  if (!rows.length) return;
- if (!confirm("記録を消去しますか？")) return;
+
+ if (!confirm("記録を消去しますか？")) {
+  return;
+ }
 
  rows = [];
- lastLog = 0;
- el("count").textContent = "記録件数: 0";
- setStatus("記録データを消去しました",
-   active?"running":"stopped");
+ displayTask();
+
+ setStatus(
+  "記録データを消去しました",
+  active ? "running" : "stopped"
+ );
 }
 
-document.addEventListener("visibilitychange",()=>{
- if (document.hidden && active) stopSensor();
-});
+// Stop background sensor processing.
+document.addEventListener(
+ "visibilitychange",()=>{
+  if (document.hidden && active) {
+   stopSensor();
+  }
+ }
+);
 
-buttons();
-recalculate();
+// Initialization
+updateButtons();
+loadPeriod();
+displayTask();
+
 </script>
 </body>
 </html>
