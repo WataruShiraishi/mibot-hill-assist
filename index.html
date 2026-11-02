@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d35">
-<title>MOTION CORE HILL ASSIST v1.2.1</title>
+<title>MOTION CORE HILL ASSIST v1.2.2</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eaf4ef;color:#18332d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:12px 12px 36px;font-size:15px}
 .wrap{max-width:900px;margin:auto}.hero{background:linear-gradient(130deg,#083a33,#15614f);color:#fff;border-radius:20px;padding:16px;margin-bottom:12px}
@@ -29,7 +29,7 @@ canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid 
 <body>
 <div class="wrap">
   <div class="hero">
-    <div class="heroHead"><div class="brandFrame"><img src="logo.png" alt="MotionCore ロゴ" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logoFallback" style="display:none">MC</span></div><div class="brandText"><h1>MOTION CORE HILL ASSIST</h1><div class="sub">v1.2.1｜停止勾配推定＋GPS走行評価<br>MotionCoreロゴ：旧版と同じ logo.png を使用</div></div></div>
+    <div class="heroHead"><div class="brandFrame"><img src="logo.png" alt="MotionCore ロゴ" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logoFallback" style="display:none">MC</span></div><div class="brandText"><h1>MOTION CORE HILL ASSIST</h1><div class="sub">v1.2.2｜停止勾配推定＋GPS走行評価｜状態判定改善<br>MotionCoreロゴ：旧版と同じ logo.png を使用</div></div></div>
   </div>
 
   <div class="tabs">
@@ -79,10 +79,13 @@ canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid 
         <div class="stat"><div class="name">前後加速度</div><div id="longAcc" class="value">-- m/s²</div></div>
         <div class="stat"><div class="name">ジャイロ合成</div><div id="gyroMag" class="value">-- deg/s</div></div>
         <div class="stat"><div class="name">センサ有効</div><div id="sensorValid" class="value">--</div></div>
+        <div class="stat"><div class="name">GPS停止判定</div><div id="gpsMotionState" class="value">--</div></div>
+        <div class="stat"><div class="name">状態変化の理由</div><div id="transitionReason" class="value" style="font-size:15px">--</div></div>
+        <div class="stat"><div class="name">確定値の利用可否</div><div id="holdUsable" class="value" style="font-size:20px">--</div></div>
       </div>
       <div style="height:8px"></div>
       <div class="small">
-        HILL-HOLD専用停止勾配推定モードの判定条件：<span class="pill">低車速</span><span class="pill">低ジャイロ</span><span class="pill">低前後加速度</span><span class="pill">水平ゼロ校正済み</span>
+        HILL-HOLD専用停止勾配推定モードの判定条件（GPS速度不明は確定不可）：<span class="pill">低車速</span><span class="pill">低ジャイロ</span><span class="pill">低前後加速度</span><span class="pill">水平ゼロ校正済み</span>
       </div>
     </div>
 
@@ -111,6 +114,25 @@ canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid 
       <div class="note">計算式：T<sub>wheel</sub> = (車両質量＋積載) × 9.80665 × タイヤ半径 × sin(arctan(勾配[%]/100))。T<sub>motor</sub> = T<sub>wheel</sub> / (減速比 × 伝達効率)。アルファード・N-WGNのCVT/ハイブリッドでは単一のモータ軸トルクを表すものではありません。</div>
     </div>
 
+    <div class="card">
+      <h2>停止判定・保持設定（v1.2.2）</h2>
+      <div class="grid2">
+        <div><label>移動確定しきい値 [km/h]</label><input id="exitKphTh" type="number" step="0.1" min="0.2" value="2.0"></div>
+        <div><label>移動判定継続時間 [秒]</label><input id="moveConfirmSec" type="number" step="0.1" min="0.2" value="0.6"></div>
+        <div><label>小振動の保持猶予 [秒]</label><input id="holdGraceSec" type="number" step="0.1" min="0.2" value="1.2"></div>
+        <div><label>GPS欠測の保持猶予 [秒]</label><input id="gpsGraceSec" type="number" step="0.1" min="0.2" value="3.0"></div>
+      </div>
+      <div class="note">HOLD GRACE中は前回の確定値を表示しますが、現在有効な保持指令とは扱いません。値の保持と制御利用可否は分離します。</div>
+    </div>
+    <div class="card">
+      <h2>独立基準勾配との比較（停車中に記録）</h2>
+      <div class="grid2">
+        <div><label>基準勾配 [%]（上り＋／下り−）</label><input id="referenceGrade" type="number" step="0.01" placeholder="例：5.00"></div>
+        <div><label>測定方法・地点メモ</label><input id="referenceMethod" type="text" placeholder="例：傾斜計、停車地点A"></div>
+      </div>
+      <button id="recordReference" class="secondary" type="button" style="margin-top:10px">基準勾配と現在の確定値をCSVへ記録</button>
+      <div class="note" id="referenceResult">基準勾配はiPhoneとは別の傾斜計などで測り、安全な場所に駐車してから入力してください。</div>
+    </div>
     <div class="card">
       <h2>設置条件・簡易設定</h2>
       <div class="grid2">
@@ -229,9 +251,50 @@ let active=false, motionPerm=false, geoPerm=false, geoWatchId=null;
 let latest={aig:null,acc:null,gyro:null,beta:null,gamma:null,orientationTs:0,motionTs:0,gps:null};
 let calib={ok:false, up0:null, f0:null, r0:null, samples:[]};
 let state={pitch:null,grade:null,filteredGrade:null,gpsGrade:null,longAcc:null,gyroMag:null,stopStableSec:0,confidence:null,candidateGrade:null,confirmedGrade:null,holdState:'OFF'};
-let session={rows:[], points:[], startMs:null, stopMarks:[]};
+let session={rows:[], points:[], startMs:null, stopMarks:[], references:[]};
 let filter={grade:null};
-let lastLoopTs=0;
+let lastLoopTs=0,lastRenderTs=0;
+const HOLD={enterQuietSec:1.3,gyroEnter:3.0,gyroExit:5.5,accEnter:0.25,accExit:0.55,imuFreshMs:1200,gpsFreshMs:2500};
+let classifier={stopEventId:0,stableSince:null,quietSince:null,moveSince:null,gpsMissingSince:null,disturbedSince:null,transitionReason:'初期状態',transitionCount:0,confirmedAt:null,referenceGrade:null,referenceMethod:'',referenceError:null,lastValidGpsMotion:'UNKNOWN'};
+let transitionThisRow=false;
+function transition(next,reason,now){
+  if(state.holdState!==next){state.holdState=next;classifier.transitionCount++;classifier.transitionReason=reason; transitionThisRow=true;}
+}
+function resetStopClassifier(reason='停止判定をリセット'){
+  classifier.stableSince=null; classifier.quietSince=null;classifier.moveSince=null;
+  classifier.gpsMissingSince=null;classifier.disturbedSince=null;classifier.confirmedAt=null;
+  state.stopStableSec=0;state.candidateGrade=null;state.confirmedGrade=null;
+  state.holdUsable=false;state.gpsMotionState='UNKNOWN';
+  transition(calib.ok?'ARMED':'NO CAL',reason,performance.now());
+}
+function threshold(id,def,min,max){const v=Number(el(id)?.value);return Number.isFinite(v)?clamp(v,min,max):def;}
+function freshGPS(now=Date.now()){
+  const g=latest.gps;return g && Number.isFinite(g.ts) && g.ts<=now+5000 && now-g.ts<=HOLD.gpsFreshMs;
+}
+function gpsMotion(now=Date.now()){
+  const g=latest.gps;
+  if(!freshGPS(now) || !Number.isFinite(g.speedMps) || g.speedMps<0 || !Number.isFinite(g.accM) || g.accM>35) return 'UNKNOWN';
+  const kph=g.speedMps*3.6;
+  const enter=threshold('stopKphTh',1.0,0.1,10);
+  const exit=Math.max(enter+0.2,threshold('exitKphTh',2.0,0.2,20));
+  if(kph<=enter) return 'STOP';
+  if(kph>=exit) return 'MOVING';
+  return 'BETWEEN';
+}
+function pushReference(){
+  const g=Number(el('referenceGrade').value);
+  if(!el('referenceGrade').value.trim() || !Number.isFinite(g)||Math.abs(g)>100){setStatus('基準勾配[%]を適切に入力してください。','warn');return;}
+  if(!Number.isFinite(state.confirmedGrade)){setStatus('確定勾配がありません。停止し確定後に記録してください。','warn');return;}
+  classifier.referenceGrade=g;classifier.referenceMethod=el('referenceMethod').value.trim();
+  classifier.referenceError=state.confirmedGrade-g;
+  el('referenceResult').textContent=`基準 ${fmt(g,2,'%')} / IMU ${fmt(state.confirmedGrade,2,'%')} / 差 ${fmt(classifier.referenceError,2,'ポイント')}：CSVへ追記しました`;
+  const p=latest.gps||{};
+  if(!session.startMs){setStatus('先に計測を開始してください。','warn');return;}
+  session.references.push({stop_event_id:classifier.stopEventId,t_s:(Date.now()-session.startMs)/1000,reference_grade_pct:g,confirmed_grade_pct:state.confirmedGrade,error_pp:classifier.referenceError,method:classifier.referenceMethod,lat:p.lat,lon:p.lon});
+  transitionThisRow=true; // 区間の新しい基準値を次行に記録
+}
+el('recordReference').onclick=pushReference;
+
 
 function setStatus(msg,cls=''){el('status').className='status'+(cls?` ${cls}`:'');el('status').textContent=msg}
 function switchTab(which){const hill=which==='hill';el('pageHill').classList.toggle('active',hill);el('pageGps').classList.toggle('active',!hill);el('tabHill').classList.toggle('active',hill);el('tabGps').classList.toggle('active',!hill)}
@@ -280,7 +343,7 @@ for(const id of ['vehicleName','vehicleMass','vehiclePayload','vehicleRadius','v
 loadVehiclePreset();
 function invalidateCalibration(message){
   calib={ok:false,up0:null,f0:null,r0:null,samples:[]};
-  filter.grade=null;state.grade=null;state.filteredGrade=null;state.confirmedGrade=null;state.candidateGrade=null;state.holdState='NO CAL';state.stopStableSec=0;
+  filter.grade=null;state.grade=null;state.filteredGrade=null;resetStopClassifier('取付姿勢を変更・校正無効');
   setStatus(message,'warn');updateDisplay();
 }
 
@@ -331,6 +394,7 @@ function startGeoWatch(){
       p.cumDist=(prev.cumDist||0)+(Number.isFinite(d)?d:0);
     }else p.cumDist=0;
     session.points.push(p);
+    if(session.points.length>12000)session.points.shift();
     state.gpsGrade=computeGpsGrade(session.points);
     renderGPS();
   }, err=>{setStatus('GPS取得に失敗しました。屋外または位置情報設定を確認してください。','warn');}, {enableHighAccuracy:true, maximumAge:0, timeout:10000});
@@ -380,7 +444,7 @@ function zeroCalibrate(){
       const f0=normalize(f0raw); const r0=normalize(cross(mean,f0));
       if(!f0||!r0){setStatus('校正に失敗しました。設置姿勢または軸設定を確認してください。','err'); return;}
       calib={ok:true, up0:mean, f0, r0, samples};
-      filter.grade=null; state.confirmedGrade=null; state.candidateGrade=null; state.stopStableSec=0; state.holdState='ARMED';
+      filter.grade=null;resetStopClassifier('水平ゼロ校正完了');
       setStatus('水平ゼロ校正完了。坂道停止時に勾配が確定します。','ok');
       updateDisplay();
     }
@@ -391,7 +455,7 @@ el('zeroBtn').onclick=zeroCalibrate;
 async function startRun(){
   if(active) return;
   if(!motionPerm && !geoPerm) await requestAllPermissions();
-  active=true; session={rows:[], points:[], startMs:Date.now(), stopMarks:[]}; state.confirmedGrade=null; state.candidateGrade=null; state.stopStableSec=0; state.holdState=calib.ok?'ARMED':'NO CAL';
+  active=true; session={rows:[], points:[], startMs:Date.now(), stopMarks:[], references:[]};resetStopClassifier('計測開始'); classifier.stopEventId=0;
   startGeoWatch(); loop(); el('startBtn').disabled=true; el('stopBtn').disabled=false;
   setStatus('計測中。平坦でゼロ校正を行ってから評価してください。', calib.ok?'ok':'warn');
 }
@@ -420,7 +484,7 @@ function computeGpsGrade(points){
 
 function computeConfidence(speedKph,longAcc,gyroMag){
   if(!calib.ok) return null;
-  const sScore=clamp(1-(speedKph||0)/2.0,0,1);
+  const sScore=Number.isFinite(speedKph)?clamp(1-speedKph/2,0,1):0;
   const aScore=clamp(1-Math.abs(longAcc||0)/0.35,0,1);
   const gScore=clamp(1-(gyroMag||0)/5,0,1);
   return 100*(0.35*sScore+0.35*aScore+0.30*gScore);
@@ -431,44 +495,102 @@ function loop(ts=performance.now()){
   if(ts-lastLoopTs<100){requestAnimationFrame(loop); return;} lastLoopTs=ts;
   const up=computeUpVector();
   const gps=latest.gps;
-  let speedKph = Number.isFinite(gps?.speedMps)? gps.speedMps*3.6 : null;
+  let speedKph = freshGPS() && Number.isFinite(gps?.speedMps)? gps.speedMps*3.6 : null;
   let longAcc=null, gyroMag=null, pitch=null, grade=null;
-  if(up && calib.ok){
+  if(up && calib.ok && latest.motionTs>0 && (ts-latest.motionTs)<HOLD.imuFreshMs){
     pitch=Math.asin(clamp(dot(up,calib.f0),-1,1))*DEG;
     grade=Math.tan(pitch*Math.PI/180)*100;
     filter.grade = filter.grade===null ? grade : (0.85*filter.grade + 0.15*grade);
     state.filteredGrade=filter.grade;
   }
-  if(latest.acc && calib.ok){ longAcc = dot(latest.acc, calib.f0); }
-  if(latest.gyro){ gyroMag = Math.hypot(latest.gyro[0], latest.gyro[1], latest.gyro[2]); }
+  if(latest.acc && calib.ok && latest.motionTs>0 && (ts-latest.motionTs)<HOLD.imuFreshMs){ longAcc = dot(latest.acc, calib.f0); }
+  if(latest.gyro && latest.motionTs>0 && (ts-latest.motionTs)<HOLD.imuFreshMs){ gyroMag = Math.hypot(latest.gyro[0], latest.gyro[1], latest.gyro[2]); }
   state.pitch=pitch; state.grade=state.filteredGrade; state.longAcc=longAcc; state.gyroMag=gyroMag;
   state.confidence=computeConfidence(speedKph,longAcc,gyroMag);
 
-  const stopKphTh=Number(el('stopKphTh').value)||1.0;
-  const motionFresh=latest.motionTs>0 && (ts-latest.motionTs)<1200;
-  const gpsFresh=Number.isFinite(gps?.speedMps) && Date.now()-(gps?.ts||0)<3000;
-  const stopLike=(calib.ok && motionFresh && Number.isFinite(state.grade) && Number.isFinite(longAcc) && Number.isFinite(gyroMag) && gpsFresh && speedKph<=stopKphTh && Math.abs(longAcc)<=0.25 && gyroMag<=4.0);
-  if(stopLike){
-    state.stopStableSec += 0.1;
-    state.candidateGrade=state.grade;
-    if(state.stopStableSec<1.5) state.holdState='JUDGING';
-    else {
-      state.holdState='HOLD READY';
-      if(!Number.isFinite(state.confirmedGrade)){
-        state.confirmedGrade=state.grade;
-        session.stopMarks.push({t:(Date.now()-session.startMs)/1000, grade:state.confirmedGrade});
+  // GPS停止/移動/欠測と、IMU静穏状態を分離する。
+  const gpsStatus=gpsMotion();
+  state.gpsMotionState=gpsStatus;
+  const motionFresh=latest.motionTs>0 && (ts-latest.motionTs)<HOLD.imuFreshMs;
+  const imuOk=calib.ok&&motionFresh&&up&&Number.isFinite(state.grade)&&Number.isFinite(longAcc)&&Number.isFinite(gyroMag);
+  const wasReady=['HOLD READY','HOLD GRACE','GPS UNKNOWN'].includes(state.holdState) && Number.isFinite(state.confirmedGrade);
+  state.holdUsable=false;
+  if(!imuOk){
+    if(state.holdState!=='SENSOR INVALID' && state.holdState!=='NO CAL'){
+      resetStopClassifier(!calib.ok?'水平ゼロ校正が必要':'IMU更新停止・推定無効');
+    }
+    state.grade=null;state.filteredGrade=null;filter.grade=null;
+    transition(!calib.ok?'NO CAL':'SENSOR INVALID',!calib.ok?'未校正':'センサ鮮度・データ異常',ts);
+  } else {
+    const quiet=gyroMag<=HOLD.gyroEnter && Math.abs(longAcc)<=HOLD.accEnter;
+    const exitQuiet=gyroMag>HOLD.gyroExit || Math.abs(longAcc)>HOLD.accExit;
+    if(gpsStatus==='MOVING'){
+      if(classifier.moveSince===null) classifier.moveSince=ts;
+    }else classifier.moveSince=null;
+    if(classifier.moveSince!==null && ts-classifier.moveSince>=1000*threshold('moveConfirmSec',0.6,0.2,5)){
+      resetStopClassifier('GPS速度：移動を継続検出');
+      transition('MOVING','GPS速度が移動しきい値を継続超過',ts);
+    }else if(gpsStatus==='UNKNOWN'){
+      if(classifier.gpsMissingSince===null)classifier.gpsMissingSince=ts;
+      if(wasReady){
+        if(ts-classifier.gpsMissingSince>1000*threshold('gpsGraceSec',3,0.2,20)){
+          resetStopClassifier('GPS速度欠測が許容時間超過');
+          transition('GPS UNKNOWN','GPS速度が欠測／古い（確定無効）',ts);
+        } else transition('GPS UNKNOWN','GPS速度が欠測／古い（前回値参考保持）',ts);
+      }else{
+        classifier.stableSince=null;classifier.quietSince=null;state.stopStableSec=0;
+        transition('GPS UNKNOWN','GPS速度が欠測／古い（停止確定不可）',ts);
+      }
+    }else if(gpsStatus==='BETWEEN'){
+      if(classifier.disturbedSince===null)classifier.disturbedSince=ts;
+      if(wasReady && ts-classifier.disturbedSince<=1000*threshold('holdGraceSec',1.2,0.2,10)){
+        transition('HOLD GRACE','GPS速度：停止と移動の中間（値のみ保持）',ts);
+      } else {
+        if(wasReady)resetStopClassifier('GPS速度が中間域に長時間滞留');
+        classifier.stableSince=null;classifier.quietSince=null;state.stopStableSec=0;
+        transition('SPEED UNCERTAIN','GPS速度：停止と移動の中間',ts);
+      }
+    }else if(gpsStatus==='MOVING'){
+      if(wasReady) transition('HOLD GRACE','GPS移動判定デバウンス中（値のみ保持）',ts);
+      else transition('MOVING','GPS速度が移動しきい値超過',ts);
+    }else if(gpsStatus==='STOP'){
+      classifier.gpsMissingSince=null;
+      if(classifier.disturbedSince!==null && state.holdState==='HOLD GRACE' && state.confirmedGrade===null) classifier.disturbedSince=null;
+      if(classifier.stableSince===null){classifier.stableSince=ts;classifier.stopEventId++;classifier.referenceGrade=null;classifier.referenceMethod='';classifier.referenceError=null;}
+      state.stopStableSec=(ts-classifier.stableSince)/1000;
+      state.candidateGrade=state.grade;
+      if(quiet){
+        classifier.disturbedSince=null;
+        if(classifier.quietSince===null)classifier.quietSince=ts;
+        const quietSec=(ts-classifier.quietSince)/1000;
+        if(wasReady){
+          transition('HOLD READY','GPS停止・IMU静穏に復帰',ts);
+          state.holdUsable=true;
+        }else if(quietSec>=HOLD.enterQuietSec){
+          state.confirmedGrade=state.grade; classifier.confirmedAt=ts;
+          session.stopMarks.push({t:(Date.now()-session.startMs)/1000, grade:state.confirmedGrade,stop_id:classifier.stopEventId});
+          transition('HOLD READY','GPS停止・IMU静穏が1.3秒継続：勾配確定',ts);
+          state.holdUsable=true;
+        }else transition('JUDGING','GPS停止・静穏確定待ち',ts);
+      }else{
+        classifier.quietSince=null;
+        if(wasReady){
+          if(classifier.disturbedSince===null)classifier.disturbedSince=ts;
+          if(ts-classifier.disturbedSince<=1000*threshold('holdGraceSec',1.2,0.2,10)){
+            transition('HOLD GRACE',exitQuiet?'IMU振動：解除しきい値超過（値のみ保持）':'IMU軽微振動（値のみ保持）',ts);
+          }else{
+            state.confirmedGrade=null;
+            transition('JUDGING','IMU振動が猶予時間超過：確定値破棄',ts);
+          }
+        }else transition('JUDGING','GPS停止・IMU静穏不足',ts);
       }
     }
-  } else {
-    state.stopStableSec=0;
-    state.candidateGrade=null;
-    state.confirmedGrade=null;
-    if(!calib.ok) state.holdState='NO CAL';
-    else state.holdState='MOVING';
   }
+  state.confidence=computeConfidence(gpsStatus==='STOP'?0:null,longAcc,gyroMag);
+  state.transitionReason=classifier.transitionReason;
   updateDisplay();
   logRow();
-  renderGPS();
+  if(ts-lastRenderTs>=1000){renderGPS();lastRenderTs=ts;}
   requestAnimationFrame(loop);
 }
 
@@ -479,10 +601,13 @@ function updateDisplay(){
   el('gradeConfirmed').textContent=fmt(state.confirmedGrade,2,' %');
   el('stableSec').textContent=fmt(state.stopStableSec,1,' s');
   el('confidence').textContent=fmt(state.confidence,0,' %');
-  el('gpsSpeed').textContent=fmt(Number.isFinite(latest.gps?.speedMps)?latest.gps.speedMps*3.6:null,1,' km/h');
+  el('gpsSpeed').textContent=fmt(freshGPS()&&Number.isFinite(latest.gps?.speedMps)?latest.gps.speedMps*3.6:null,1,' km/h');
   el('longAcc').textContent=fmt(state.longAcc,3,' m/s²');
   el('gyroMag').textContent=fmt(state.gyroMag,2,' deg/s');
-  el('sensorValid').textContent=(latest.motionTs&&performance.now()-latest.motionTs<1200)?'OK':'NG';
+  el('sensorValid').textContent=(latest.motionTs&&performance.now()-latest.motionTs<HOLD.imuFreshMs)?'OK':'NG';
+  el('gpsMotionState').textContent=state.gpsMotionState||'UNKNOWN';
+  el('transitionReason').textContent=classifier.transitionReason||'--';
+  el('holdUsable').textContent=state.holdUsable?'有効（参考）':'無効・参考のみ';
   el('gpsLat').textContent=fmtPlain(latest.gps?.lat,6);
   el('gpsLon').textContent=fmtPlain(latest.gps?.lon,6);
   el('gpsAlt').textContent=fmt(latest.gps?.alt,1,' m');
@@ -490,7 +615,7 @@ function updateDisplay(){
   el('gpsGrade').textContent=fmt(state.gpsGrade,2,' %');
   el('gpsAcc').textContent=fmt(latest.gps?.accM,1,' m');
   const box=el('holdState'); box.textContent=state.holdState;
-  const cls = state.holdState==='HOLD READY'?'state-ok':state.holdState==='JUDGING'?'state-warn':(state.holdState==='MOVING'||state.holdState==='NO CAL')?'state-bad':'state-off';
+  const cls = state.holdState==='HOLD READY'?'state-ok':['JUDGING','HOLD GRACE','GPS UNKNOWN','SPEED UNCERTAIN'].includes(state.holdState)?'state-warn':(state.holdState==='MOVING'||state.holdState==='NO CAL'||state.holdState==='SENSOR INVALID')?'state-bad':'state-off';
   box.className='stateBox '+cls;
   updateVehicleTorque();
 }
@@ -500,7 +625,14 @@ function logRow(){
   const t=((Date.now()-session.startMs)/1000).toFixed(2);
   const p=latest.gps||{};
   session.rows.push({
-    t_s:t, time_iso:new Date().toISOString(),
+    t_s:t, time_iso:new Date().toISOString(),app_version:'1.2.2',
+    stop_event_id:classifier.stopEventId, transition_count:classifier.transitionCount,
+    state_transition:transitionThisRow?1:0,transition_reason:classifier.transitionReason,
+    gps_motion_state:state.gpsMotionState,hold_usable:state.holdUsable?1:0,
+    stop_stable_sec:state.stopStableSec,
+    reference_grade_pct:classifier.referenceGrade,reference_method:classifier.referenceMethod,
+    reference_error_pp:classifier.referenceError,
+
     vehicle_preset:el('vehiclePreset').value,vehicle_name:el('vehicleName').value,
     vehicle_mass_kg:readVehicle().mass, vehicle_payload_kg:readVehicle().payload,
     tire_radius_m:readVehicle().radius, reduction_ratio:readVehicle().ratio,
@@ -515,9 +647,10 @@ function logRow(){
     gyro_x:latest.gyro?.[0], gyro_y:latest.gyro?.[1], gyro_z:latest.gyro?.[2],
     pitch_deg:state.pitch, grade_pct:state.grade, candidate_grade_pct:state.candidateGrade, confirmed_grade_pct:state.confirmedGrade,
     confidence_pct:state.confidence, hold_state:state.holdState,
-    gps_lat:p.lat, gps_lon:p.lon, gps_alt_m:p.alt, gps_speed_mps:p.speedMps, gps_accuracy_m:p.accM, gps_grade_pct:state.gpsGrade,
+    gps_lat:p.lat, gps_lon:p.lon, gps_alt_m:p.alt, gps_speed_mps:freshGPS()?p.speedMps:null, gps_accuracy_m:p.accM, gps_grade_pct:state.gpsGrade,
     gps_distance_m:session.points.at(-1)?.cumDist||0, sensor_valid:(latest.motionTs&&performance.now()-latest.motionTs<1500)?1:0
   });
+  transitionThisRow=false;
 }
 
 function downloadCsv(){
@@ -527,7 +660,7 @@ function downloadCsv(){
     const v=r[h]; if(v===null||v===undefined) return ''; if(typeof v==='number'&&Number.isFinite(v)) return String(v); const s=String(v).replace(/"/g,'""'); return /[",\n]/.test(s)?`"${s}"`:s;
   }).join(',')));
   const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
-  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`MOTION_CORE_HILL_ASSIST_v1_2_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`; a.click(); URL.revokeObjectURL(a.href);
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`MOTION_CORE_HILL_ASSIST_v1_2_2_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`; a.click(); URL.revokeObjectURL(a.href);
 }
 el('csvBtn').onclick=downloadCsv;
 
@@ -545,8 +678,8 @@ el('csvFile').addEventListener('change', async e=>{
   session.rows=rows;
   session.points=[]; session.stopMarks=[];
   for(const r of rows){
-    if(Number.isFinite(r.gps_lat)&&Number.isFinite(r.gps_lon)) session.points.push({lat:r.gps_lat, lon:r.gps_lon, alt:r.gps_alt_m, cumDist:r.gps_distance_m});
-    if(Number.isFinite(r.confirmed_grade_pct)) session.stopMarks.push({t:r.t_s, grade:r.confirmed_grade_pct});
+    if(r.gps_lat!==''&&r.gps_lon!==''&&Number.isFinite(r.gps_lat)&&Number.isFinite(r.gps_lon)) session.points.push({lat:r.gps_lat, lon:r.gps_lon, alt:r.gps_alt_m, cumDist:r.gps_distance_m});
+    if(r.confirmed_grade_pct!==''&&r.confirmed_grade_pct!=null&&Number.isFinite(r.confirmed_grade_pct)) session.stopMarks.push({t:r.t_s, grade:r.confirmed_grade_pct});
   }
   setStatus(`CSV読込完了：${rows.length}行`, 'ok'); renderGPS(); switchTab('gps');
 });
@@ -572,13 +705,13 @@ function drawRoute(){
 function drawTrend(){
   const c=el('trendCanvas'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle='#fbfdfc'; ctx.fillRect(0,0,c.width,c.height); ctx.strokeStyle='#d9e8e1'; ctx.strokeRect(0.5,0.5,c.width-1,c.height-1);
   const rows=session.rows; if(rows.length<2){ctx.fillStyle='#6f877c'; ctx.font='16px sans-serif'; ctx.fillText('時系列データ待機中 / CSV未読込',20,28); return;}
-  const pts=rows.map(r=>({t:Number(r.t_s), imu:Number(r.grade_pct), gps:Number(r.gps_grade_pct), conf:Number(r.confirmed_grade_pct)})).filter(r=>Number.isFinite(r.t));
+  const pts=rows.map(r=>({t:Number(r.t_s), imu:(r.grade_pct==null||r.grade_pct===''?null:Number(r.grade_pct)), gps:(r.gps_grade_pct==null||r.gps_grade_pct===''?null:Number(r.gps_grade_pct)), conf:(r.confirmed_grade_pct==null||r.confirmed_grade_pct===''?null:Number(r.confirmed_grade_pct))})).filter(r=>Number.isFinite(r.t));
   const tMin=pts[0].t, tMax=pts.at(-1).t||1; const yMin=-15, yMax=15; const padL=44,padR=12,padT=12,padB=28;
   const X=t=>padL+(c.width-padL-padR)*(t-tMin)/Math.max(1e-6,tMax-tMin), Y=v=>c.height-padB-(c.height-padT-padB)*(v-yMin)/(yMax-yMin);
   ctx.strokeStyle='#d5e4dd'; ctx.lineWidth=1; for(let y=-10;y<=10;y+=5){const py=Y(y); ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(c.width-padR,py); ctx.stroke(); ctx.fillStyle='#789084'; ctx.font='11px sans-serif'; ctx.fillText(`${y}%`,6,py+4);}
-  ctx.strokeStyle='#0f9d58'; ctx.lineWidth=2; ctx.beginPath(); let started=false; for(const p of pts){ if(Number.isFinite(p.imu)){ const x=X(p.t), y=Y(clamp(p.imu,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
-  ctx.strokeStyle='#2276cc'; ctx.lineWidth=2; ctx.beginPath(); started=false; for(const p of pts){ if(Number.isFinite(p.gps)){ const x=X(p.t), y=Y(clamp(p.gps,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
-  ctx.fillStyle='#da8b13'; for(const p of pts){ if(Number.isFinite(p.conf)){ ctx.beginPath(); ctx.arc(X(p.t), Y(clamp(p.conf,yMin,yMax)), 3, 0, Math.PI*2); ctx.fill(); } }
+  ctx.strokeStyle='#0f9d58'; ctx.lineWidth=2; ctx.beginPath(); let started=false; for(const p of pts){ if(p.imu!==null&&Number.isFinite(p.imu)){ const x=X(p.t), y=Y(clamp(p.imu,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
+  ctx.strokeStyle='#2276cc'; ctx.lineWidth=2; ctx.beginPath(); started=false; for(const p of pts){ if(p.gps!==null&&Number.isFinite(p.gps)){ const x=X(p.t), y=Y(clamp(p.gps,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
+  ctx.fillStyle='#da8b13'; for(const p of pts){ if(p.conf!==null&&Number.isFinite(p.conf)){ ctx.beginPath(); ctx.arc(X(p.t), Y(clamp(p.conf,yMin,yMax)), 3, 0, Math.PI*2); ctx.fill(); } }
   ctx.fillStyle='#31564a'; ctx.font='12px sans-serif'; ctx.fillText('緑: IMU勾配', padL, 18); ctx.fillText('青: GPS勾配', padL+120, 18); ctx.fillText('橙点: 停止時確定勾配', padL+235, 18);
 }
 
