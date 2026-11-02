@@ -4,11 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#0b3d35">
-<title>MOTION CORE HILL ASSIST v1.2</title>
+<title>MOTION CORE HILL ASSIST v1.2.1</title>
 <style>
 *{box-sizing:border-box}body{margin:0;background:#eaf4ef;color:#18332d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:12px 12px 36px;font-size:15px}
 .wrap{max-width:900px;margin:auto}.hero{background:linear-gradient(130deg,#083a33,#15614f);color:#fff;border-radius:20px;padding:16px;margin-bottom:12px}
-.hero h1{margin:0;font-size:clamp(18px,4vw,28px)}.sub{font-size:12px;color:#c4eadc;margin-top:6px;line-height:1.6}
+.hero h1{margin:0;font-size:clamp(17px,4vw,28px)}
+.heroHead{display:flex;gap:12px;align-items:center}.brandFrame{width:76px;height:76px;flex:0 0 76px;background:white;border-radius:13px;display:flex;align-items:center;justify-content:center;overflow:hidden}.brandFrame img{height:100%;width:100%;object-fit:contain;padding:4px}.logoFallback{color:#11654e;font-size:20px;font-weight:900;letter-spacing:-1px}.brandText{min-width:0}.hero .sub{line-height:1.55}.sub{font-size:12px;color:#c4eadc;margin-top:6px;line-height:1.6}
 .tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.tab{border:0;border-radius:12px;padding:13px 10px;font-weight:800;background:#dcebe5;color:#21463c;cursor:pointer}.tab.active{background:#11815e;color:#fff}
 .page{display:none}.page.active{display:block}
 .card{background:#fff;border:1px solid #d3e3db;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(18,67,54,.08)}
@@ -28,8 +29,7 @@ canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid 
 <body>
 <div class="wrap">
   <div class="hero">
-    <h1>MOTION CORE HILL ASSIST v1.2</h1>
-    <div class="sub">2画面構成：<b>HILL-HOLD主画面</b> と <b>GPS走行評価画面</b>。<br>主用途は停止時の勾配確定です。GPSは評価・照合用途として分離しています。</div>
+    <div class="heroHead"><div class="brandFrame"><img src="logo.png" alt="MotionCore ロゴ" onerror="this.style.display='none';this.nextElementSibling.style.display='block'"><span class="logoFallback" style="display:none">MC</span></div><div class="brandText"><h1>MOTION CORE HILL ASSIST</h1><div class="sub">v1.2.1｜停止勾配推定＋GPS走行評価<br>MotionCoreロゴ：旧版と同じ logo.png を使用</div></div></div>
   </div>
 
   <div class="tabs">
@@ -84,6 +84,31 @@ canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid 
       <div class="small">
         HILL-HOLD専用停止勾配推定モードの判定条件：<span class="pill">低車速</span><span class="pill">低ジャイロ</span><span class="pill">低前後加速度</span><span class="pill">水平ゼロ校正済み</span>
       </div>
+    </div>
+
+    <div class="card">
+      <h2>車両諸元設定・保持トルク（編集可能）</h2>
+      <label for="vehiclePreset">車種プリセット</label>
+      <select id="vehiclePreset">
+        <option value="alphard">アルファード ハイブリッド（参考値）</option>
+        <option value="nwgn" selected>N-WGN（実測時の参考値）</option>
+        <option value="mibot">mibot（開発諸元）</option>
+        <option value="custom">自由設定（手入力）</option>
+      </select>
+      <div class="grid2">
+        <div><label for="vehicleMass">車両質量 [kg]</label><input id="vehicleMass" type="number" step="1" min="1" value="850"></div>
+        <div><label for="vehiclePayload">乗員・積載 [kg]</label><input id="vehiclePayload" type="number" step="1" min="0" value="70"></div>
+        <div><label for="vehicleRadius">有効タイヤ半径 [m]</label><input id="vehicleRadius" type="number" step="0.001" min="0.01" value="0.279"></div>
+        <div><label for="vehicleRatio">駆動系減速比（参考）</label><input id="vehicleRatio" type="number" step="0.001" min="0.01" value="4.318"></div>
+        <div><label for="vehicleEfficiency">駆動伝達効率（0〜1）</label><input id="vehicleEfficiency" type="number" step="0.01" min="0.01" max="1" value="0.90"></div>
+        <div><label for="vehicleName">表示車種名（編集可）</label><input id="vehicleName" type="text" value="N-WGN"></div>
+      </div>
+      <div class="grid2" style="margin-top:12px">
+        <div class="stat"><div class="name">必要車輪トルク｜確定勾配</div><div id="wheelTorque" class="value">-- Nm</div></div>
+        <div class="stat"><div class="name">参考モータ軸トルク｜確定勾配</div><div id="motorTorque" class="value">-- Nm</div></div>
+      </div>
+      <div class="note" id="vehicleNote" style="margin-top:10px">車両諸元は評価用の初期値です。車両仕様に合わせて確認・変更してください。</div>
+      <div class="note">計算式：T<sub>wheel</sub> = (車両質量＋積載) × 9.80665 × タイヤ半径 × sin(arctan(勾配[%]/100))。T<sub>motor</sub> = T<sub>wheel</sub> / (減速比 × 伝達効率)。アルファード・N-WGNのCVT/ハイブリッドでは単一のモータ軸トルクを表すものではありません。</div>
     </div>
 
     <div class="card">
@@ -217,7 +242,47 @@ function presetAxes(){
   if(p==='nwgn'){el('axisForward').value='0,0,-1'; el('axisRight').value='-1,0,0';}
   else if(p==='alphard'){el('axisForward').value='0,1,0'; el('axisRight').value='1,0,0';}
 }
-el('mountPreset').addEventListener('change', presetAxes); presetAxes();
+el('mountPreset').addEventListener('change', ()=>{presetAxes(); invalidateCalibration('端末取付設定を変更しました。水平ゼロ校正をやり直してください。');}); presetAxes();
+for(const id of ['axisForward','axisRight']) el(id).addEventListener('change', ()=>invalidateCalibration('端末の軸設定を変更しました。水平ゼロ校正をやり直してください。'));
+
+const VEHICLE_PRESETS={
+  alphard:{name:'アルファード ハイブリッド',mass:2190,payload:70,radius:0.36,ratio:1,efficiency:0.90,note:'アルファード：グレード・タイヤ仕様で変動します。質量・半径は暫定値。ハイブリッドの減速比は単一で表せないため1を仮置き（参考モータ軸トルクは評価不可）。'},
+  nwgn:{name:'N-WGN',mass:850,payload:70,radius:0.279,ratio:4.318,efficiency:0.90,note:'N-WGN：前回の実測評価時の参考条件。4.318は最終減速比の例で、CVT総減速比ではありません。'},
+  mibot:{name:'mibot',mass:473,payload:0,radius:0.254,ratio:11.00,efficiency:0.95,note:'mibot：開発時の参考パラメータ（473kg、0.254m、11.00）。車両質量に乗員を含むか確認して積載を入力してください。'},
+  custom:{name:'自由設定',mass:1000,payload:0,radius:0.30,ratio:10,efficiency:0.90,note:'自由設定：諸元をすべて手入力してください。'}
+};
+function loadVehiclePreset(){
+  const v=VEHICLE_PRESETS[el('vehiclePreset').value]||VEHICLE_PRESETS.custom;
+  for(const [id,key] of [['vehicleName','name'],['vehicleMass','mass'],['vehiclePayload','payload'],['vehicleRadius','radius'],['vehicleRatio','ratio'],['vehicleEfficiency','efficiency']]) el(id).value=v[key];
+  el('vehicleNote').textContent=v.note; updateVehicleTorque();
+}
+function readVehicle(){
+  const v={name:el('vehicleName').value,mass:Number(el('vehicleMass').value),payload:Number(el('vehiclePayload').value),radius:Number(el('vehicleRadius').value),ratio:Number(el('vehicleRatio').value),efficiency:Number(el('vehicleEfficiency').value)};
+  v.valid=v.mass>0&&v.payload>=0&&v.radius>0&&v.ratio>0&&v.efficiency>0&&v.efficiency<=1&&Object.values(v).every(x=>typeof x!=='number'||Number.isFinite(x));
+  return v;
+}
+function updateVehicleTorque(){
+  const v=readVehicle(); const g=state.confirmedGrade;
+  if(!v.valid||!Number.isFinite(g)){
+    el('wheelTorque').textContent='-- Nm';el('motorTorque').textContent='-- Nm'; return;
+  }
+  const angle=Math.atan(g/100);
+  const tw=(v.mass+v.payload)*G*v.radius*Math.sin(angle);
+  const tm=tw/(v.ratio*v.efficiency);
+  el('wheelTorque').textContent=fmt(tw,2,' Nm');
+  const isComplex=(el('vehiclePreset').value==='alphard'||el('vehiclePreset').value==='nwgn');
+  el('motorTorque').textContent=isComplex?'算出対象外':fmt(tm,2,' Nm');
+}
+el('vehiclePreset').addEventListener('change',loadVehiclePreset);
+for(const id of ['vehicleName','vehicleMass','vehiclePayload','vehicleRadius','vehicleRatio','vehicleEfficiency']){
+  el(id).addEventListener('input',()=>{if(el('vehiclePreset').value!=='custom'){el('vehiclePreset').value='custom';el('vehicleNote').textContent='自由設定に切り替えました。元の車種名も編集できます。';} updateVehicleTorque();});
+}
+loadVehiclePreset();
+function invalidateCalibration(message){
+  calib={ok:false,up0:null,f0:null,r0:null,samples:[]};
+  filter.grade=null;state.grade=null;state.filteredGrade=null;state.confirmedGrade=null;state.candidateGrade=null;state.holdState='NO CAL';state.stopStableSec=0;
+  setStatus(message,'warn');updateDisplay();
+}
 
 function parseAxis(s){return s.split(',').map(Number)}
 function getVehicleAxes(){
@@ -337,14 +402,17 @@ el('startBtn').onclick=startRun; el('stopBtn').onclick=stopRun;
 
 function computeGpsGrade(points){
   if(points.length<2) return null;
-  const cur=points[points.length-1]; if(!Number.isFinite(cur.alt)) return null;
+  const cur=points[points.length-1];
+  if(!Number.isFinite(cur.alt)||!Number.isFinite(cur.altAccM)||cur.altAccM>15)return null;
   for(let i=points.length-2;i>=0;i--){
-    const p=points[i]; if(!Number.isFinite(p.alt)) continue;
+    const p=points[i];
+    if(!Number.isFinite(p.alt)||!Number.isFinite(p.altAccM)||p.altAccM>15)continue;
     const dist=(cur.cumDist||0)-(p.cumDist||0);
-    if(dist>=20){
+    if(dist>=80 && dist<=150){
       const dz=cur.alt-p.alt;
-      if(Math.abs(dz)>80) return null;
-      return 100*dz/dist;
+      const candidate=100*dz/dist;
+      if(Math.abs(dz)>20||Math.abs(candidate)>25)return null;
+      return candidate;
     }
   }
   return null;
@@ -377,14 +445,24 @@ function loop(ts=performance.now()){
   state.confidence=computeConfidence(speedKph,longAcc,gyroMag);
 
   const stopKphTh=Number(el('stopKphTh').value)||1.0;
-  const stopLike=(calib.ok && Number.isFinite(state.grade) && (speedKph===null || speedKph<=stopKphTh) && Math.abs(longAcc||0)<=0.25 && (gyroMag||99)<=4.0);
+  const motionFresh=latest.motionTs>0 && (ts-latest.motionTs)<1200;
+  const gpsFresh=Number.isFinite(gps?.speedMps) && Date.now()-(gps?.ts||0)<3000;
+  const stopLike=(calib.ok && motionFresh && Number.isFinite(state.grade) && Number.isFinite(longAcc) && Number.isFinite(gyroMag) && gpsFresh && speedKph<=stopKphTh && Math.abs(longAcc)<=0.25 && gyroMag<=4.0);
   if(stopLike){
     state.stopStableSec += 0.1;
     state.candidateGrade=state.grade;
     if(state.stopStableSec<1.5) state.holdState='JUDGING';
-    else { state.holdState='HOLD READY'; state.confirmedGrade=state.grade; if(!session.stopMarks.length || Math.abs((session.stopMarks[session.stopMarks.length-1].t||0) - ((Date.now()-session.startMs)/1000))>3){ session.stopMarks.push({t:(Date.now()-session.startMs)/1000, grade:state.confirmedGrade}); } }
+    else {
+      state.holdState='HOLD READY';
+      if(!Number.isFinite(state.confirmedGrade)){
+        state.confirmedGrade=state.grade;
+        session.stopMarks.push({t:(Date.now()-session.startMs)/1000, grade:state.confirmedGrade});
+      }
+    }
   } else {
     state.stopStableSec=0;
+    state.candidateGrade=null;
+    state.confirmedGrade=null;
     if(!calib.ok) state.holdState='NO CAL';
     else state.holdState='MOVING';
   }
@@ -404,7 +482,7 @@ function updateDisplay(){
   el('gpsSpeed').textContent=fmt(Number.isFinite(latest.gps?.speedMps)?latest.gps.speedMps*3.6:null,1,' km/h');
   el('longAcc').textContent=fmt(state.longAcc,3,' m/s²');
   el('gyroMag').textContent=fmt(state.gyroMag,2,' deg/s');
-  el('sensorValid').textContent=(latest.motionTs&&performance.now()-latest.motionTs<1500)?'OK':'NG';
+  el('sensorValid').textContent=(latest.motionTs&&performance.now()-latest.motionTs<1200)?'OK':'NG';
   el('gpsLat').textContent=fmtPlain(latest.gps?.lat,6);
   el('gpsLon').textContent=fmtPlain(latest.gps?.lon,6);
   el('gpsAlt').textContent=fmt(latest.gps?.alt,1,' m');
@@ -414,6 +492,7 @@ function updateDisplay(){
   const box=el('holdState'); box.textContent=state.holdState;
   const cls = state.holdState==='HOLD READY'?'state-ok':state.holdState==='JUDGING'?'state-warn':(state.holdState==='MOVING'||state.holdState==='NO CAL')?'state-bad':'state-off';
   box.className='stateBox '+cls;
+  updateVehicleTorque();
 }
 
 function logRow(){
@@ -422,6 +501,14 @@ function logRow(){
   const p=latest.gps||{};
   session.rows.push({
     t_s:t, time_iso:new Date().toISOString(),
+    vehicle_preset:el('vehiclePreset').value,vehicle_name:el('vehicleName').value,
+    vehicle_mass_kg:readVehicle().mass, vehicle_payload_kg:readVehicle().payload,
+    tire_radius_m:readVehicle().radius, reduction_ratio:readVehicle().ratio,
+    drivetrain_efficiency:readVehicle().efficiency,
+    mount_preset:el('mountPreset').value,
+    gps_fix_time_iso:p.ts?new Date(p.ts).toISOString():'',
+    gps_age_ms:p.ts?Date.now()-p.ts:null,
+    gps_horizontal_accuracy_m:p.accM, gps_vertical_accuracy_m:p.altAccM,
     beta_deg:latest.beta, gamma_deg:latest.gamma,
     accg_x:latest.aig?.[0], accg_y:latest.aig?.[1], accg_z:latest.aig?.[2],
     acc_x:latest.acc?.[0], acc_y:latest.acc?.[1], acc_z:latest.acc?.[2],
