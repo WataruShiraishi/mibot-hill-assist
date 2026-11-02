@@ -1,580 +1,504 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
+<meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#c7f8e2">
-<title>MOTION CORE HILL ASSIST v1.0</title>
+<meta name="theme-color" content="#0b3d35">
+<title>MOTION CORE HILL ASSIST v1.2</title>
 <style>
-*{box-sizing:border-box}
-body{margin:0;padding:16px 13px 30px;min-height:100vh;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#20382b;background:linear-gradient(140deg,#ddffec,#b8efd6,#eafff3)}
-.wrap{max-width:980px;margin:auto}
-.hero,.card{background:white;border:2px solid #b8e8d0;border-radius:22px;padding:16px;margin-bottom:12px;box-shadow:0 6px 20px #42775818}
-.hero{background:linear-gradient(120deg,#fff7d7,#fff,#ecfff4)}
-.head{display:flex;align-items:center;gap:8px}.logo{width:80px;height:80px;flex-shrink:0;object-fit:contain;background:white;border-radius:16px;padding:2px}.headtext{flex:1;min-width:0}
-h1{margin:0;font-size:clamp(10px,2.65vw,19px);white-space:nowrap;letter-spacing:-.4px;font-weight:800}.sub{font-size:12px;color:#64806f;margin-top:5px}
-.controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-button{border:0;border-radius:16px;padding:14px 9px;font-size:16px;font-weight:bold;width:100%;margin-bottom:10px;cursor:pointer}
-button:disabled{opacity:.45}.start{background:#3cdb92;color:#14402c}.stop{background:#ff9999;color:#6b2424}.yellow{background:#ffe77a;color:#5a4600}.blue{background:#9cddff;color:#15445c}.purple{background:#d8c7ff;color:#432d78}
-h2{font-size:15px;color:#60796a;margin:0 0 8px}.big{font-size:41px;font-weight:800;line-height:1.2;font-variant-numeric:tabular-nums}.smallbig{font-size:27px;font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums}
-.note{font-size:12px;color:#637b6c;line-height:1.6}.sep{height:1px;background:#d9eee2;margin:13px 0}
-.torque{background:linear-gradient(140deg,#fff,#edfff5);border-color:#70dba5}.torque .big,.torque .smallbig{color:#07894e}
-.grid{display:grid;gap:12px;grid-template-columns:1fr}.grid2{display:grid;gap:12px;grid-template-columns:1fr 1fr}
-.status{display:inline-block;border-radius:100px;padding:10px 15px;background:#edf1ef;color:#627568;font-weight:800;border:2px solid #d7e2db}
-.status.running{background:#d9ffeb;color:#00884c;border-color:#26ce7c}.status.stopped,.status.error{background:#ffe1e1;color:#ba2836;border-color:#ff7777}.status.running:before,.status.stopped:before,.status.error:before{content:"● "}
-label{display:block;font-size:13px;font-weight:bold;color:#526b5c;margin-bottom:5px}
-input,select{width:100%;padding:12px;font-size:16px;border:1px solid #b8dac7;border-radius:11px;background:#fafffc;color:#20382b}
-.fields{display:grid;grid-template-columns:1fr 1fr;gap:12px}.warning{background:#fff5d9;color:#795b20;padding:11px;border-radius:12px;font-size:12px;line-height:1.6;margin-top:10px}#count{font-size:13px;color:#637b6c;margin-top:10px}.footer{font-size:12px;color:#637b6c;line-height:1.7}
-.period-box{background:#eefcf5;border-radius:14px;padding:13px;margin-top:10px}.period-value{color:#07894e;font-size:21px;font-weight:800;margin-top:8px}
-.gps-details{display:grid;grid-template-columns:1fr 1fr;gap:12px}.gps-details>div{min-width:0}.gps-val{font-weight:800;font-size:21px;font-variant-numeric:tabular-nums;margin:4px 0 8px;word-break:break-word}.gpscard{border-color:#a6d8fb}.gpscard .big{color:#166fa4}
-.eval{border-color:#d5c7ff;background:linear-gradient(140deg,#fff,#f6f2ff)}
-.legend{display:flex;flex-wrap:wrap;gap:10px 14px;font-size:12px;color:#556c5e;margin-top:10px}
-.legend-item{display:flex;align-items:center;gap:7px}.swatch{width:16px;height:16px;border-radius:5px;display:inline-block;border:1px solid #98ad9f}.dot{width:12px;height:12px;border-radius:50%;display:inline-block;border:1px solid #666}.line{width:20px;height:4px;border-radius:4px;display:inline-block}
-.canvasbox{background:#fbfefd;border:1px solid #d9ebe0;border-radius:16px;padding:8px}.canvasbox canvas{width:100%;height:auto;display:block;background:white;border-radius:12px}
-.summary{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:10px}.summary .item{background:#f7fbf8;border:1px solid #dcebe1;border-radius:14px;padding:10px}.summary .label{font-size:12px;color:#6b7d72}.summary .value{font-size:20px;font-weight:800;font-variant-numeric:tabular-nums;color:#234533}
-.toolbar{display:grid;grid-template-columns:1fr;gap:10px}.toolbar .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-.helper{font-size:12px;color:#5f7067;line-height:1.6}
-.state-high{color:#0e9152}.state-mid{color:#b07c10}.state-low{color:#c54a4a}.state-stop{color:#0a6aa7}.state-accel{color:#0d9051}.state-decel{color:#c7771a}.state-cruise{color:#68757a}.state-unknown{color:#7a59a7}
-@media(min-width:700px){.grid{grid-template-columns:1fr 1fr}.toolbar{grid-template-columns:1fr 1fr}}
-@media(max-width:700px){.grid2{grid-template-columns:1fr}.summary{grid-template-columns:1fr 1fr}.toolbar .row{grid-template-columns:1fr}}
-@media(max-width:380px){.logo{width:70px;height:70px}h1{font-size:clamp(9px,2.6vw,12px)}.big{font-size:34px}}
+*{box-sizing:border-box}body{margin:0;background:#eaf4ef;color:#18332d;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:12px 12px 36px;font-size:15px}
+.wrap{max-width:900px;margin:auto}.hero{background:linear-gradient(130deg,#083a33,#15614f);color:#fff;border-radius:20px;padding:16px;margin-bottom:12px}
+.hero h1{margin:0;font-size:clamp(18px,4vw,28px)}.sub{font-size:12px;color:#c4eadc;margin-top:6px;line-height:1.6}
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}.tab{border:0;border-radius:12px;padding:13px 10px;font-weight:800;background:#dcebe5;color:#21463c;cursor:pointer}.tab.active{background:#11815e;color:#fff}
+.page{display:none}.page.active{display:block}
+.card{background:#fff;border:1px solid #d3e3db;border-radius:18px;padding:14px;margin-bottom:12px;box-shadow:0 4px 14px rgba(18,67,54,.08)}
+.card h2{margin:0 0 12px;font-size:17px;color:#295345}.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}.grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+@media (max-width:700px){.grid2,.grid3{grid-template-columns:1fr 1fr}}@media (max-width:500px){.grid2,.grid3{grid-template-columns:1fr}}
+.stat{background:#f3f9f6;border-radius:14px;padding:12px;min-width:0}.stat .name{font-size:12px;color:#587267}.stat .value{font-size:clamp(20px,5vw,32px);font-weight:800;margin-top:6px;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.big{font-size:clamp(32px,8vw,48px);color:#0f7a58;font-weight:900}.small{font-size:12px;color:#637e72;line-height:1.6}.stateBox{padding:14px;border-radius:14px;border:2px solid #b7c9c0;background:#f3f7f5;text-align:center;font-weight:900;font-size:clamp(20px,6vw,30px)}
+.state-ok{background:#e2f7ea;border-color:#34b970;color:#0c6d43}.state-warn{background:#fff6d9;border-color:#f1cb57;color:#8a6609}.state-bad{background:#ffe8e8;border-color:#e89a9a;color:#aa3030}.state-off{background:#eef2ef;border-color:#c8d4ce;color:#667a71}
+button{width:100%;border:0;border-radius:12px;padding:13px 12px;font-size:15px;font-weight:800;cursor:pointer}.primary{background:#19b57a;color:#fff}.secondary{background:#d9eaff;color:#134b74}.stop{background:#ffd0c9;color:#7c2f2a}.muted{background:#e6ece8;color:#31574b}.warnBtn{background:#ffe59a;color:#714c09}
+button:disabled{opacity:.5;cursor:not-allowed}.buttonRow{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}@media (max-width:700px){.buttonRow{grid-template-columns:1fr 1fr}}
+label{display:block;font-size:13px;color:#47675b;font-weight:700;margin:6px 0}input,select{width:100%;padding:11px;border-radius:10px;border:1px solid #bdd3c8;background:#fff;font-size:16px;color:#18332d}
+.status{padding:10px 12px;border-radius:12px;background:#f1f6f3;font-size:13px;line-height:1.6;color:#32564a}.status.ok{background:#e4f7ea;color:#136a43}.status.warn{background:#fff6db;color:#7d5d07}.status.err{background:#ffe9e9;color:#9d2e2e}
+hr{border:none;border-top:1px solid #e2ece7;margin:12px 0}.pill{display:inline-block;background:#edf5f1;color:#33564b;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:700;margin:0 6px 6px 0}
+canvas{display:block;width:100%;height:auto;background:#fbfdfc;border:1px solid #d7e8df;border-radius:12px}.note{font-size:12px;color:#657d73;line-height:1.7}.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace}
 </style>
 </head>
 <body>
 <div class="wrap">
-<header class="hero">
-  <div class="head">
-    <img src="logo.png" class="logo" alt="MOTION CORE">
-    <div class="headtext">
-      <h1>MOTION CORE HILL ASSIST</h1>
-      <div class="sub">v1.0 / Direct Gravity + Axis Validation + GPS</div>
+  <div class="hero">
+    <h1>MOTION CORE HILL ASSIST v1.2</h1>
+    <div class="sub">2画面構成：<b>HILL-HOLD主画面</b> と <b>GPS走行評価画面</b>。<br>主用途は停止時の勾配確定です。GPSは評価・照合用途として分離しています。</div>
+  </div>
+
+  <div class="tabs">
+    <button id="tabHill" class="tab active" type="button">HILL-HOLD主画面</button>
+    <button id="tabGps" class="tab" type="button">GPS走行評価画面</button>
+  </div>
+
+  <div class="card">
+    <div class="buttonRow">
+      <button id="permBtn" class="secondary" type="button">① 権限許可</button>
+      <button id="startBtn" class="primary" type="button">② 計測開始</button>
+      <button id="stopBtn" class="stop" type="button" disabled>③ 計測停止</button>
+      <button id="zeroBtn" class="warnBtn" type="button">④ 水平ゼロ校正</button>
+    </div>
+    <div style="height:8px"></div>
+    <div id="status" class="status">待機中。平坦で停車した状態で「権限許可」→「計測開始」→「水平ゼロ校正」を行ってください。</div>
+  </div>
+
+  <div id="pageHill" class="page active">
+    <div class="card">
+      <h2>停止勾配推定</h2>
+      <div class="grid2">
+        <div class="stat">
+          <div class="name">現在の車両ピッチ角</div>
+          <div id="pitchNow" class="value big">-- °</div>
+        </div>
+        <div class="stat">
+          <div class="name">現在の勾配</div>
+          <div id="gradeNow" class="value big">-- %</div>
+        </div>
+        <div class="stat">
+          <div class="name">停止候補勾配</div>
+          <div id="gradeCandidate" class="value">-- %</div>
+        </div>
+        <div class="stat">
+          <div class="name">確定勾配（HILL-HOLD用）</div>
+          <div id="gradeConfirmed" class="value">-- %</div>
+        </div>
+      </div>
+      <div style="height:10px"></div>
+      <div id="holdState" class="stateBox state-off">OFF</div>
+      <div style="height:10px"></div>
+      <div class="grid3">
+        <div class="stat"><div class="name">停止安定時間</div><div id="stableSec" class="value">0.0 s</div></div>
+        <div class="stat"><div class="name">推定信頼度</div><div id="confidence" class="value">-- %</div></div>
+        <div class="stat"><div class="name">車速(GPS)</div><div id="gpsSpeed" class="value">-- km/h</div></div>
+        <div class="stat"><div class="name">前後加速度</div><div id="longAcc" class="value">-- m/s²</div></div>
+        <div class="stat"><div class="name">ジャイロ合成</div><div id="gyroMag" class="value">-- deg/s</div></div>
+        <div class="stat"><div class="name">センサ有効</div><div id="sensorValid" class="value">--</div></div>
+      </div>
+      <div style="height:8px"></div>
+      <div class="small">
+        HILL-HOLD専用停止勾配推定モードの判定条件：<span class="pill">低車速</span><span class="pill">低ジャイロ</span><span class="pill">低前後加速度</span><span class="pill">水平ゼロ校正済み</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>設置条件・簡易設定</h2>
+      <div class="grid2">
+        <div>
+          <label>端末取付プリセット</label>
+          <select id="mountPreset">
+            <option value="nwgn">N-WGN：縦置き / 背面前方 / 画面運転席側</option>
+            <option value="alphard">アルファード：上端前方の斜め置き</option>
+            <option value="custom">カスタム軸設定</option>
+          </select>
+        </div>
+        <div>
+          <label>停止判定しきい値（GPS速度 km/h）</label>
+          <input id="stopKphTh" type="number" step="0.1" value="1.0">
+        </div>
+        <div>
+          <label>前方軸（カスタム用）</label>
+          <select id="axisForward">
+            <option value="0,1,0">+Y</option>
+            <option value="0,-1,0">-Y</option>
+            <option value="1,0,0">+X</option>
+            <option value="-1,0,0">-X</option>
+            <option value="0,0,1">+Z</option>
+            <option value="0,0,-1">-Z</option>
+          </select>
+        </div>
+        <div>
+          <label>右方向軸（カスタム用）</label>
+          <select id="axisRight">
+            <option value="0,0,-1">-Z</option>
+            <option value="0,0,1">+Z</option>
+            <option value="1,0,0">+X</option>
+            <option value="-1,0,0">-X</option>
+            <option value="0,1,0">+Y</option>
+            <option value="0,-1,0">-Y</option>
+          </select>
+        </div>
+      </div>
+      <div class="note" style="margin-top:8px">
+        NWGN既定値では <span class="mono">前方=-Z / 右=-X / 上=前方×右</span> を使用します。<br>
+        取付方法が異なる場合はカスタム軸設定で変更してください。
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>使い方</h2>
+      <div class="note">
+        1. 車両を平坦な場所に停車し、端末をブラケットへ固定。<br>
+        2. 「権限許可」を押し、モーション/GPS許可を与える。<br>
+        3. 「計測開始」を押す。<br>
+        4. そのまま静止して「水平ゼロ校正」を押す。<br>
+        5. 坂道で停止すると、状態が <b>JUDGING → HOLD READY</b> へ移り、確定勾配が更新される。<br>
+        6. 記録終了後はGPS走行評価画面で軌跡・GPS勾配・CSV確認を行う。
+      </div>
     </div>
   </div>
-</header>
 
-<div class="controls">
-  <button id="startBtn" class="start" onclick="startSensor()">▶ スタート</button>
-  <button id="stopBtn" class="stop" onclick="stopSensor()" disabled>■ ストップ</button>
-</div>
-
-<div class="grid">
-  <section class="card">
-    <h2>車両前後方向の相対傾斜（3軸補正）</h2>
-    <div id="pitch" class="big">-- °</div>
-    <div class="note">iPhoneから取得した参考勾配率（IMU）</div>
-    <div id="grade" class="smallbig">-- %</div>
-  </section>
-  <section class="card">
-    <h2>車両左右方向の相対傾斜（3軸補正）</h2>
-    <div id="roll" class="big">-- °</div>
-    <div class="note">加速度ノルム（重力込み）</div>
-    <div id="accel" class="smallbig">-- m/s²</div>
-  </section>
-</div>
-
-<div class="grid">
-  <section class="card eval">
-    <h2>IMU信頼度</h2>
-    <div id="imuConfidence" class="big">-- %</div>
-    <div id="imuConfidenceText" class="note">停止・平坦・加速度外乱小のとき高くなります</div>
-  </section>
-  <section class="card eval">
-    <h2>加減速状態</h2>
-    <div id="driveState" class="big">--</div>
-    <div class="note">前後加速度（選択した設置モードでの近似方向）</div>
-    <div id="longitudinalAcc" class="smallbig">-- m/s²</div>
-    <div id="gpsSpeed" class="note">GPS速度：-- m/s</div>
-  </section>
-</div>
-
-<section class="card eval">
-  <h2>v1.0：3軸重力・符号検証</h2>
-  <div class="grid2">
-    <div><div class="note">直接推定した端末上向き重力ベクトル（単位ベクトル）</div><div id="gravityVector" class="gps-val">-- / -- / --</div></div>
-    <div><div class="note">重力取得方式・新鮮度</div><div id="gravityStatus" class="gps-val">未取得</div></div>
-    <div><div class="note">直接重力による勾配</div><div id="gravityGrade" class="gps-val">-- %</div></div>
-    <div><div class="note">従来beta/gammaとの差（姿勢角）</div><div id="orientationDelta" class="gps-val">-- °</div></div>
-  </div>
-  <div id="axisStatus" class="note">平坦路で校正後、既知の上り坂で停止し、符号を確認してください。</div>
-  <div class="grid2" style="margin-top:10px">
-    <button class="blue" onclick="verifyUphill()">▲ 上り坂で符号確認</button>
-    <button class="yellow" onclick="resetSlopeSign()">↺ 符号検証をリセット</button>
-  </div>
-  <div class="warning">「上り坂で符号確認」は、実際に上り坂を向いて安全に停止している時だけ押してください。姿勢系との差が大きい場合は検証を中止してください。自動的に道路勾配の真値を取得する機能ではありません。加減速中は誤判定し得るため押さないでください。</div>
-</section>
-
-<section class="card torque">
-  <h2>HILL HOLD 理論必要トルク</h2>
-  <div class="note">必要タイヤトルク（駆動輪合計）</div>
-  <div id="wheelTorque" class="big">-- Nm</div>
-  <div class="sep"></div>
-  <div class="note">必要モータートルク（概算）</div>
-  <div id="motorTorque" class="smallbig">-- Nm</div>
-  <div class="sep"></div>
-  <div class="note">演算に使用したセンサー勾配</div>
-  <div id="usedGrade" class="smallbig">-- %</div>
-  <p id="torqueInfo" class="note">センサー計測と水平校正が必要です</p>
-</section>
-
-<section class="card gpscard">
-  <h2>GPS高度による平均勾配（参考）</h2>
-  <div id="gpsGrade" class="big">-- %</div>
-  <div id="gpsGradeWindow" class="note">高度差を比較する移動区間：-- m</div>
-  <div class="sep"></div>
-  <div class="gps-details">
-    <div><div class="note">GPS標高</div><div id="gpsAltitude" class="gps-val">-- m</div></div>
-    <div><div class="note">GPS高度差</div><div id="gpsDeltaH" class="gps-val">-- m</div></div>
-    <div><div class="note">水平移動累積距離</div><div id="gpsDistance" class="gps-val">-- m</div></div>
-    <div><div class="note">GPS水平精度</div><div id="gpsHAcc" class="gps-val">-- m</div></div>
-    <div><div class="note">GPS高度精度</div><div id="gpsVAcc" class="gps-val">-- m</div></div>
-    <div><div class="note">GPS位置情報の経過時間</div><div id="gpsAge" class="gps-val">-- s</div></div>
-  </div>
-  <div id="gpsState" class="note">GPS待機中</div>
-  <div class="warning">GPS高度差は移動区間の平均勾配であり、停止直前の局所勾配ではありません。標高精度不足時は表示を無効化します。</div>
-</section>
-
-
-
-<section class="card eval">
-  <h2>走行ルート × 推定勾配 × IMU信頼度 × 加減速状態</h2>
-  <div class="canvasbox"><canvas id="routeCanvas" width="920" height="480"></canvas></div>
-  <div class="legend">
-    <div class="legend-item"><span class="line" style="background:linear-gradient(90deg,#1f7ae0,#72c6ff,#7ccf7c,#ffc857,#ef4444)"></span>線色：推定勾配（下り→平坦→上り）</div>
-    <div class="legend-item"><span class="dot" style="background:#0d9051"></span>点色：加速</div>
-    <div class="legend-item"><span class="dot" style="background:#c7771a"></span>点色：減速</div>
-    <div class="legend-item"><span class="dot" style="background:#68757a"></span>点色：定常</div>
-    <div class="legend-item"><span class="dot" style="background:#0a6aa7"></span>点色：停止</div>
-    <div class="legend-item">点サイズ：IMU信頼度</div>
-  </div>
-  <div class="summary">
-    <div class="item"><div class="label">表示モード</div><div id="analysisModeLabel" class="value">ライブ</div></div>
-    <div class="item"><div class="label">評価サンプル数</div><div id="summarySamples" class="value">0</div></div>
-    <div class="item"><div class="label">推定走行距離</div><div id="summaryDistance" class="value">0.0 m</div></div>
-    <div class="item"><div class="label">平均IMU信頼度</div><div id="summaryConfidence" class="value">-- %</div></div>
-    <div class="item"><div class="label">最大上り勾配</div><div id="summaryUpGrade" class="value">-- %</div></div>
-    <div class="item"><div class="label">最大下り勾配</div><div id="summaryDownGrade" class="value">-- %</div></div>
-    <div class="item"><div class="label">低信頼度比率</div><div id="summaryLowRatio" class="value">-- %</div></div>
-    <div class="item"><div class="label">加減速比率</div><div id="summaryStateMix" class="value">--</div></div>
-  </div>
-  <div class="warning">ルート表示には、GPS緯度・経度を含む記録データが必要です。GPS精度が悪い区間、トンネル、停車直後はルートと勾配が不安定になることがあります。</div>
-</section>
-
-<section class="card eval">
-  <h2>時系列評価</h2>
-  <div class="canvasbox"><canvas id="timelineCanvas" width="920" height="440"></canvas></div>
-  <div class="helper">上段：推定勾配[%] ／ 中段：IMU信頼度[%] ／ 下段：前後加速度[m/s²]。背景色は加減速状態を示します。</div>
-</section>
-
-<section class="card eval">
-  <h2>評価データの切替</h2>
-  <div class="toolbar">
-    <div class="row">
-      <button class="purple" onclick="useLiveSamples()">ライブ記録を表示</button>
-      <button class="yellow" onclick="clearImportedSamples()">読込データを消去</button>
+  <div id="pageGps" class="page">
+    <div class="card">
+      <h2>GPS走行評価</h2>
+      <div class="grid3">
+        <div class="stat"><div class="name">緯度</div><div id="gpsLat" class="value">--</div></div>
+        <div class="stat"><div class="name">経度</div><div id="gpsLon" class="value">--</div></div>
+        <div class="stat"><div class="name">高度</div><div id="gpsAlt" class="value">-- m</div></div>
+        <div class="stat"><div class="name">累積距離</div><div id="gpsDist" class="value">0.0 m</div></div>
+        <div class="stat"><div class="name">GPS勾配</div><div id="gpsGrade" class="value">-- %</div></div>
+        <div class="stat"><div class="name">測位精度</div><div id="gpsAcc" class="value">-- m</div></div>
+      </div>
+      <div class="note" style="margin-top:8px">GPS勾配は評価用です。停止中のHILL-HOLD確定値には直接使いません。</div>
     </div>
-    <div>
-      <label for="csvFile">保存済みCSVを読込（v0.9以降推奨）</label>
-      <input id="csvFile" type="file" accept=".csv" onchange="importCSVFile(event)">
+
+    <div class="card">
+      <h2>走行軌跡</h2>
+      <canvas id="routeCanvas" width="860" height="360"></canvas>
+      <div class="note">GPS座標から簡易ルートを描画します。地図タイルは使わず、オフラインでも動作します。</div>
+    </div>
+
+    <div class="card">
+      <h2>勾配トレンド（IMU / GPS）</h2>
+      <canvas id="trendCanvas" width="860" height="320"></canvas>
+      <div class="note">緑：IMU勾配、青：GPS勾配、橙点：停止時確定勾配。</div>
+    </div>
+
+    <div class="card">
+      <h2>CSV入出力</h2>
+      <div class="grid2">
+        <div>
+          <button id="csvBtn" class="secondary" type="button">CSV保存</button>
+          <div class="note">現在の計測ログをCSVとして保存します。</div>
+        </div>
+        <div>
+          <label>CSV読込（後解析用）</label>
+          <input id="csvFile" type="file" accept=".csv">
+          <div class="note">本ツールで出力したCSVを再読込し、軌跡と勾配を再表示できます。</div>
+        </div>
+      </div>
     </div>
   </div>
-  <div id="importState" class="note">CSV未読込。記録中はライブデータが自動で反映されます。</div>
-</section>
-
-<section class="card">
-  <h2>更新周期設定</h2>
-  <label for="displayPeriod">画面の表示更新周期</label>
-  <select id="displayPeriod" onchange="changePeriod()">
-    <option value="100">100 ms（高速・10 Hz）</option>
-    <option value="250" selected>250 ms（標準・4 Hz）</option>
-    <option value="500">500 ms（安定・2 Hz）</option>
-    <option value="1000">1000 ms（低速・1 Hz）</option>
-  </select>
-  <div class="period-box"><div class="note">現在の表示周期</div><div id="periodLabel" class="period-value">250 ms / 4 Hz</div></div>
-  <div class="note" style="margin-top:10px">トルク演算：100 ms（固定）<br>CSV記録：100 ms（固定）<br>勾配LPF時定数：0.3 秒（固定）<br>GPS更新：ブラウザ／OSの位置情報更新に依存</div>
-</section>
-
-<section class="card">
-  <h2>車両スペック設定</h2>
-  <div class="fields">
-    <div><label for="mass">車両質量 [kg]</label><input id="mass" type="number" value="430" min="1" step="1" oninput="onParameterChange()"></div>
-    <div><label for="payload">乗員・積載 [kg]</label><input id="payload" type="number" value="70" min="0" step="1" oninput="onParameterChange()"></div>
-    <div><label for="radius">タイヤ有効半径 [m]</label><input id="radius" type="number" value="0.254" min="0.01" step="0.001" oninput="onParameterChange()"></div>
-    <div><label for="ratio">減速比</label><input id="ratio" type="number" value="11" min="0.1" step="0.1" oninput="onParameterChange()"></div>
-    <div style="grid-column:1/-1"><label for="eff">駆動系効率（0～1）</label><input id="eff" type="number" value="0.95" min="0.01" max="1" step="0.01" oninput="onParameterChange()"></div>
-  </div>
-  <div class="sep"></div>
-  <div id="massInfo" class="note">総質量：500 kg</div>
-</section>
-
-<section class="card">
-  <h2>iPhone取付姿勢の選択【NEW】</h2>
-  <label for="mountMode">車両前方を向くiPhoneの方向</label>
-  <select id="mountMode" onchange="changeMountMode()">
-    <option value="portrait_back" selected>N-WGN：縦向き・画面を運転席へ向ける（背面が車両前方）</option>
-    <option value="portrait_screen">縦向き・画面が車両前方を向く</option>
-    <option value="top_forward">斜め設置・端末上端が車両前方（旧アルファード方式）</option>
-    <option value="bottom_forward">端末下端が車両前方</option>
-    <option value="right_forward">端末右側面が車両前方</option>
-    <option value="left_forward">端末左側面が車両前方</option>
-  </select>
-  <div id="mountModeHelp" class="note">縦向きで画面を運転席側（車両後方）に向ける場合は「N-WGN」を使用します。ブラケットが車両前後軸から左右へ回っている場合は誤差が残ります。</div>
-  <div class="warning">設置モードを変更すると校正が無効になります。平坦な場所で停車し、毎回「水平面で3軸ゼロ校正」を押してください。画面を正面から見やすいように運転者側へ大きく傾けた場合、車両前後軸とのずれはこの校正だけでは消えません。</div>
-</section>
-
-<section class="card">
-  <h2>計測状態</h2>
-  <div id="status" class="status">計測待機中</div>
-  <div id="count">記録件数: 0</div>
-  <div id="calState" class="note">3軸水平基準：未校正</div>
-  <div id="mountState" class="note">設置モード：N-WGN 縦向きブラケット／画面は運転席側</div>
-  <div class="warning">3軸水平校正：平坦路で完全停止し、設置モードを確認してから押してください。坂道で校正すると、その坂道を0%とみなします。</div>
-</section>
-
-<button class="yellow" onclick="calibrate()">⚙ 水平面で3軸ゼロ校正</button>
-<button class="blue" id="recordBtn" onclick="toggleRecord()">⏺ CSV記録開始</button>
-<button class="yellow" onclick="saveCSV()">⬇ CSV保存</button>
-<button class="blue" onclick="clearCSV()">🗑 記録データを消去</button>
-
-<div class="footer">本アプリは研究・評価用です。3軸補正は選択した端末方向の水平投影を車両前方と仮定します。重力ベクトルはブラウザの重力込み加速度と線形加速度の差から推定し、端末姿勢変化を車体姿勢変化と見なすため、加減速による車体ピッチは補正できません。IMU勾配・GPS高度勾配は独立に計算・表示します。GPS高度は位置情報の精度に依存します。実車の保持トルク指令や安全判断には使用しないでください。GPS利用には位置情報許可とHTTPSが必要です。</div>
 </div>
 
 <script>
-"use strict";
-const CALC_MS=100, LOG_MS=100, FILTER_TAU=0.3, SENSOR_TIMEOUT_MS=1500, MAX_ROWS=10000, G=9.80665;
-const PERIOD_OPTIONS=[100,250,500,1000], PERIOD_STORAGE_KEY="motioncore_display_ms";
-const GPS_MAX_AGE_MS=10000, GPS_MAX_H_ACC_M=35, GPS_MAX_V_ACC_M=15;
-const GPS_TARGET_WINDOW_M=100, GPS_MIN_WINDOW_M=50, GPS_MAX_WINDOW_M=150, GPS_HISTORY_MAX=400, GPS_MAX_STEP_M=120;
+(()=>{
+'use strict';
+const G=9.80665, DEG=180/Math.PI;
 const el=id=>document.getElementById(id);
-const GRAVITY_MAX_AGE_MS=1200;
-const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
-let displayMs=250,calcTimer=null,logTimer=null,displayTimer=null;
-let active=false,recording=false,calibrated=false;
-let beta=null,gamma=null,orientAlpha=null,zeroBeta=0,rawPitch=null,filteredPitch=null,pitch=null,grade=null;
-let upNow=null,upZero=null,forwardDevice=null,rightDevice=null,mountQuality=null,roll3D=null;
-let mountMode="portrait_back", calibratedMountMode="";
-let accelNorm=null,wheelTorque=null,motorTorque=null,imuConfidence=null,longitudinalAcc=null,driveState="UNKNOWN";
-let gyro={x:null,y:null,z:null},linearAcc={x:null,y:null,z:null};
-let lastOrientationTime=null,lastMotionTime=null,lastFilterTime=null;
-let upDirect=null,upSensor=null,gravitySource="none",lastGravityTime=null,gravityNorm=null,orientationDelta=null;
-let slopeSign=1,signVerified=false,signNote="未検証",signCheckPitch=null;
-let rows=[],evalSamples=[],importedSamples=[],analysisMode="live";
-let gpsWatchId=null,gpsError="",gpsPoints=[],gpsTotalDistance=0,gpsLast=null,gpsGrade=null,gpsDeltaH=null,gpsWindowDistance=null;
+const clamp=(x,a,b)=>Math.min(b,Math.max(a,x));
+const norm=v=>Math.hypot(v[0],v[1],v[2]);
+const dot=(a,b)=>a[0]*b[0]+a[1]*b[1]+a[2]*b[2];
+const cross=(a,b)=>[a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]];
+const normalize=v=>{const n=norm(v);return n>1e-9?[v[0]/n,v[1]/n,v[2]/n]:null};
+const hav=(a,b)=>{const R=6371000,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180,dla=(b.lat-a.lat)*Math.PI/180,dlo=(b.lon-a.lon)*Math.PI/180;const h=Math.sin(dla/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dlo/2)**2;return 2*R*Math.asin(Math.sqrt(Math.max(0,h)))};
+const fmt=(v,d=1,u='')=>Number.isFinite(v)?`${v.toFixed(d)}${u}`:`--${u}`;
+const fmtPlain=(v,d=6)=>Number.isFinite(v)?v.toFixed(d):'--';
 
-function readNumber(id){const s=el(id).value.trim();return s===""?NaN:Number(s)}
-function numeric(v,d=2){return v===null||v===undefined||!Number.isFinite(v)?"--":v.toFixed(d)}
-function csvNum(v,d=4){return v===null||v===undefined||!Number.isFinite(v)?"":v.toFixed(d)}
-function setStatus(message,mode){el("status").textContent=message;el("status").className="status"+(mode?" "+mode:"")}
-function updateButtons(){el("startBtn").disabled=active;el("stopBtn").disabled=!active}
-function sensorFresh(){return active&&lastOrientationTime!==null&&performance.now()-lastOrientationTime<=SENSOR_TIMEOUT_MS}
-function motionFresh(){return active&&lastMotionTime!==null&&performance.now()-lastMotionTime<=SENSOR_TIMEOUT_MS}
-function gravityFresh(){return active&&lastGravityTime!==null&&performance.now()-lastGravityTime<=GRAVITY_MAX_AGE_MS&&upDirect!==null}
-function vehicleParameters(){
-  const mass=readNumber("mass"),payload=readNumber("payload"),radius=readNumber("radius"),ratio=readNumber("ratio"),efficiency=readNumber("eff");
-  return {valid:Number.isFinite(mass)&&Number.isFinite(payload)&&Number.isFinite(radius)&&Number.isFinite(ratio)&&Number.isFinite(efficiency)&&mass>0&&payload>=0&&radius>0&&ratio>0&&efficiency>0&&efficiency<=1,mass,payload,radius,ratio,efficiency,totalMass:mass+payload};
-}
-function dot3(a,b){return a[0]*b[0]+a[1]*b[1]+a[2]*b[2]}
-function cross3(a,b){return [a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]]}
-function norm3(a){return Math.hypot(a[0],a[1],a[2])}
-function safeAsin(x){return Math.asin(clamp(x,-1,1))}
-function upVectorFromDeviceOrientation(betaDeg,gammaDeg){const b=betaDeg*Math.PI/180,c=gammaDeg*Math.PI/180;return[-Math.cos(b)*Math.sin(c),Math.sin(b),Math.cos(b)*Math.cos(c)]}
-const MOUNT_AXES={
-  portrait_back:[0,0,-1],portrait_screen:[0,0,1],
-  top_forward:[0,1,0],bottom_forward:[0,-1,0],
-  right_forward:[1,0,0],left_forward:[-1,0,0]
-};
-function changeMountMode(){
-  const selected=el("mountMode").value;
-  if(recording){el("mountMode").value=mountMode;setStatus("CSV記録中は取付モードを変更できません。先に記録を停止してください", "error");return}
-  mountMode=MOUNT_AXES[selected]?selected:"portrait_back";
-  calibrated=false; calibratedMountMode=""; forwardDevice=null; rightDevice=null; upZero=null; slopeSign=1;signVerified=false;signNote="未検証";signCheckPitch=null;
-  mountQuality=null; rawPitch=null;filteredPitch=null;pitch=null;grade=null;wheelTorque=null;motorTorque=null;imuConfidence=null;longitudinalAcc=null;
-  el("calState").textContent="3軸水平基準：未校正（設置モード変更）";
-  el("mountModeHelp").textContent=mountMode==="portrait_back"?"N-WGN：iPhoneを縦置きし、画面が乗員側、端末背面が車両前方を向く場合。":mountMode==="top_forward"?"アルファード：端末の上端が前方に向く斜め置きの場合。":"端末の選択した側が車両前方を向くことを確認してください。";
-  displayTask();setStatus("設置モード変更：平坦路で再校正してください",active?"running":"stopped");
-}
-function getMountAxis(){return MOUNT_AXES[mountMode]||MOUNT_AXES.portrait_back}
-function mountLabel(){return el("mountMode").selectedOptions[0]?.textContent||mountMode}
-function haversineM(a,b){const R=6371000,la1=a.lat*Math.PI/180,la2=b.lat*Math.PI/180,dla=(b.lat-a.lat)*Math.PI/180,dlo=(b.lon-a.lon)*Math.PI/180;const h=Math.sin(dla/2)**2+Math.cos(la1)*Math.cos(la2)*Math.sin(dlo/2)**2;return 2*R*Math.asin(Math.sqrt(Math.max(0,h)))}
+let active=false, motionPerm=false, geoPerm=false, geoWatchId=null;
+let latest={aig:null,acc:null,gyro:null,beta:null,gamma:null,orientationTs:0,motionTs:0,gps:null};
+let calib={ok:false, up0:null, f0:null, r0:null, samples:[]};
+let state={pitch:null,grade:null,filteredGrade:null,gpsGrade:null,longAcc:null,gyroMag:null,stopStableSec:0,confidence:null,candidateGrade:null,confirmedGrade:null,holdState:'OFF'};
+let session={rows:[], points:[], startMs:null, stopMarks:[]};
+let filter={grade:null};
+let lastLoopTs=0;
 
-function confidenceLabel(c){if(c===null)return "--";if(c>=80)return "高";if(c>=60)return "中";return "低"}
-function confidenceClass(c){if(c===null)return "state-low";if(c>=80)return "state-high";if(c>=60)return "state-mid";return "state-low"}
-function classifyDriveState(speed,longAcc){
-  if(speed!==null&&Number.isFinite(speed)&&speed<0.5)return "STOP";
-  if(longAcc===null||!Number.isFinite(longAcc))return "UNKNOWN";
-  if(longAcc>0.35)return "ACCEL";
-  if(longAcc<-0.35)return "DECEL";
-  return "CRUISE";
+function setStatus(msg,cls=''){el('status').className='status'+(cls?` ${cls}`:'');el('status').textContent=msg}
+function switchTab(which){const hill=which==='hill';el('pageHill').classList.toggle('active',hill);el('pageGps').classList.toggle('active',!hill);el('tabHill').classList.toggle('active',hill);el('tabGps').classList.toggle('active',!hill)}
+el('tabHill').onclick=()=>switchTab('hill'); el('tabGps').onclick=()=>switchTab('gps');
+
+function presetAxes(){
+  const p=el('mountPreset').value;
+  if(p==='nwgn'){el('axisForward').value='0,0,-1'; el('axisRight').value='-1,0,0';}
+  else if(p==='alphard'){el('axisForward').value='0,1,0'; el('axisRight').value='1,0,0';}
 }
-function stateColor(state){switch(state){case"ACCEL":return"#0d9051";case"DECEL":return"#c7771a";case"STOP":return"#0a6aa7";case"CRUISE":return"#68757a";default:return"#7a59a7"}}
-function stateLabel(state){switch(state){case"ACCEL":return"加速";case"DECEL":return"減速";case"STOP":return"停止";case"CRUISE":return"定常";default:return"不明"}}
-function gradeColor(g){
-  if(!Number.isFinite(g))return "#b8c3cc";
-  if(g>=0){const t=clamp(g/8,0,1),h=55*(1-t);return `hsl(${h} 88% ${60-10*t}%)`;}
-  const t=clamp(Math.abs(g)/8,0,1),h=185+35*t;return `hsl(${h} 80% ${60-10*t}%)`;
-}
-function computeIMUConfidence(){
-  if(!calibrated||!gravityFresh()||!motionFresh())return null;
-  const accelScore=clamp(1-Math.abs((accelNorm??G)-G)/1.5,0,1);
-  const gyroMag=Math.hypot(gyro.x??0,gyro.y??0,gyro.z??0);
-  const gyroScore=clamp(1-gyroMag/15,0,1);
-  const rollScore=clamp(1-Math.abs(roll3D??0)/10,0,1);
-  const mountScore=mountQuality===null?0:clamp((mountQuality-0.25)/0.75,0,1);
-  const sourceFactor=gravitySource==="diff"?1:0.55;
-  return 100*(0.35*accelScore+0.20*gyroScore+0.20*rollScore+0.25*mountScore)*sourceFactor;
-}
-function updateEvaluationState(){
-  imuConfidence=computeIMUConfidence();
-  driveState=classifyDriveState(gpsFresh()?gpsLast?.speedMps??null:null,motionFresh()?longitudinalAcc:null);
+el('mountPreset').addEventListener('change', presetAxes); presetAxes();
+
+function parseAxis(s){return s.split(',').map(Number)}
+function getVehicleAxes(){
+  const f=normalize(parseAxis(el('axisForward').value));
+  const r=normalize(parseAxis(el('axisRight').value));
+  if(!f||!r||Math.abs(dot(f,r))>0.9) return null;
+  const u=normalize(cross(f,r));
+  const r2=normalize(cross(u,f));
+  return {f,r:r2,u};
 }
 
-// DeviceOrientation is retained as an independent comparison channel only.
-// DeviceMotion estimates an upward specific-force vector using
-// accelerationIncludingGravity - acceleration; no native gravity sensor is exposed by Safari.
-function onOrientation(event){
-  if(!active||!Number.isFinite(event.beta)||!Number.isFinite(event.gamma))return;
-  beta=event.beta;gamma=event.gamma;orientAlpha=Number.isFinite(event.alpha)?event.alpha:null;
-  upSensor=upVectorFromDeviceOrientation(beta,gamma);
-  lastOrientationTime=performance.now();
-  if(gravityFresh()&&upDirect)orientationDelta=Math.acos(clamp(dot3(upSensor,upDirect),-1,1))*180/Math.PI;
+function requestMotionPermission(){
+  const jobs=[];
+  if(typeof DeviceMotionEvent!=='undefined'&&typeof DeviceMotionEvent.requestPermission==='function') jobs.push(DeviceMotionEvent.requestPermission().catch(()=> 'denied'));
+  if(typeof DeviceOrientationEvent!=='undefined'&&typeof DeviceOrientationEvent.requestPermission==='function') jobs.push(DeviceOrientationEvent.requestPermission().catch(()=> 'denied'));
+  return Promise.all(jobs).then(res=>{motionPerm = jobs.length===0 || res.some(v=>v==='granted'); return motionPerm;}).catch(()=>false);
 }
-function updateGravityPitch(now){
-  if(!calibrated||!forwardDevice||!gravityFresh())return;
-  // Positive slope means the car-forward direction points uphill.
-  const pitchGeom=safeAsin(dot3(upDirect,forwardDevice))*180/Math.PI;
-  rawPitch=slopeSign*pitchGeom;
-  roll3D=safeAsin(dot3(upDirect,rightDevice))*180/Math.PI;
-  if(filteredPitch===null||lastFilterTime===null||now-lastFilterTime>SENSOR_TIMEOUT_MS)filteredPitch=rawPitch;
-  else{const dt=Math.max(0,(now-lastFilterTime)/1000),gain=1-Math.exp(-dt/FILTER_TAU);filteredPitch+=gain*(rawPitch-filteredPitch)}
-  lastFilterTime=now;
+function requestGeoPermission(){
+  return new Promise(resolve=>{
+    if(!navigator.geolocation){resolve(false);return;}
+    navigator.geolocation.getCurrentPosition(p=>{geoPerm=true; latest.gps=convertGeo(p); resolve(true);}, err=>{geoPerm=false; resolve(false);}, {enableHighAccuracy:true, timeout:10000, maximumAge:0});
+  });
 }
-function onMotion(event){
-  if(!active)return;
-  const now=performance.now();lastMotionTime=now;
-  const a=event.accelerationIncludingGravity;
-  const finite3=x=>x&&Number.isFinite(x.x)&&Number.isFinite(x.y)&&Number.isFinite(x.z);
-  accelNorm=finite3(a)?Math.hypot(a.x,a.y,a.z):null;
-  const r=event.rotationRate;gyro={x:Number.isFinite(r?.beta)?r.beta:null,y:Number.isFinite(r?.gamma)?r.gamma:null,z:Number.isFinite(r?.alpha)?r.alpha:null};
-  const lin=event.acceleration;linearAcc={x:Number.isFinite(lin?.x)?lin.x:null,y:Number.isFinite(lin?.y)?lin.y:null,z:Number.isFinite(lin?.z)?lin.z:null};
-  let gvec=null;
-  if(finite3(a)&&finite3(lin)){
-    gvec=[a.x-lin.x,a.y-lin.y,a.z-lin.z];gravitySource="diff";
-  }else if(finite3(a)){
-    gvec=[a.x,a.y,a.z];gravitySource="incl_only"; // dynamic acceleration not removed
-  }else gravitySource="none";
-  if(gvec){
-    const length=norm3(gvec);
-    if(length>5&&length<15){
-      // Apple/W3C normally report upward specific force at rest.
-      // If deviceorientation disagrees by >90 degrees, preserve raw readings
-      // and report it rather than silently auto-flipping the vector.
-      upDirect=gvec.map(x=>x/length);gravityNorm=length;lastGravityTime=now;
-      orientationDelta=upSensor?Math.acos(clamp(dot3(upDirect,upSensor),-1,1))*180/Math.PI:null;
-      updateGravityPitch(now);
+
+function convertGeo(pos){
+  const c=pos.coords;
+  return {lat:c.latitude, lon:c.longitude, alt:Number.isFinite(c.altitude)?c.altitude:null, speedMps:Number.isFinite(c.speed)?c.speed:null, accM:c.accuracy??null, altAccM:c.altitudeAccuracy??null, ts:pos.timestamp};
+}
+
+async function requestAllPermissions(){
+  const m=await requestMotionPermission();
+  const g=await requestGeoPermission();
+  if(m||g) setStatus(`権限確認完了。モーション:${m?'OK':'NG'} / GPS:${g?'OK':'NG'}`, (m&&g)?'ok':'warn');
+  else setStatus('権限取得に失敗しました。Safari/iPhone設定またはブラウザ権限を確認してください。','err');
+}
+el('permBtn').onclick=requestAllPermissions;
+
+function startGeoWatch(){
+  if(!navigator.geolocation) return;
+  if(geoWatchId!==null) navigator.geolocation.clearWatch(geoWatchId);
+  geoWatchId=navigator.geolocation.watchPosition(pos=>{
+    const p=convertGeo(pos); latest.gps=p;
+    if(session.points.length){
+      const prev=session.points[session.points.length-1];
+      const d=hav(prev,p);
+      p.cumDist=(prev.cumDist||0)+(Number.isFinite(d)?d:0);
+    }else p.cumDist=0;
+    session.points.push(p);
+    state.gpsGrade=computeGpsGrade(session.points);
+    renderGPS();
+  }, err=>{setStatus('GPS取得に失敗しました。屋外または位置情報設定を確認してください。','warn');}, {enableHighAccuracy:true, maximumAge:0, timeout:10000});
+}
+function stopGeoWatch(){if(geoWatchId!==null){navigator.geolocation.clearWatch(geoWatchId);geoWatchId=null;}}
+
+window.addEventListener('devicemotion', e=>{
+  latest.motionTs=performance.now();
+  latest.aig=e.accelerationIncludingGravity? [e.accelerationIncludingGravity.x??0,e.accelerationIncludingGravity.y??0,e.accelerationIncludingGravity.z??0] : null;
+  latest.acc=e.acceleration? [e.acceleration.x??0,e.acceleration.y??0,e.acceleration.z??0] : null;
+  latest.gyro=e.rotationRate? [e.rotationRate.beta??0,e.rotationRate.gamma??0,e.rotationRate.alpha??0] : null;
+}, true);
+window.addEventListener('deviceorientation', e=>{
+  latest.orientationTs=performance.now(); latest.beta=e.beta; latest.gamma=e.gamma;
+}, true);
+
+function upFromOrientation(beta,gamma){
+  if(!Number.isFinite(beta)||!Number.isFinite(gamma)) return null;
+  const b=beta/180*Math.PI, g=gamma/180*Math.PI;
+  return normalize([-Math.cos(b)*Math.sin(g), Math.sin(b), Math.cos(b)*Math.cos(g)]);
+}
+function computeUpVector(){
+  if(!latest.aig) return null;
+  let v=[...latest.aig];
+  if(latest.acc) v=[v[0]-(latest.acc[0]||0), v[1]-(latest.acc[1]||0), v[2]-(latest.acc[2]||0)];
+  let up=normalize(v); if(!up) return null;
+  const upOri=upFromOrientation(latest.beta, latest.gamma);
+  if(upOri && dot(up,upOri)<0) up=up.map(x=>-x);
+  return up;
+}
+
+function zeroCalibrate(){
+  if(!active){setStatus('先に計測開始してください。','warn'); return;}
+  const axes=getVehicleAxes();
+  if(!axes){setStatus('軸設定が不正です。前方軸と右方向軸が直交するようにしてください。','err'); return;}
+  const samples=[];
+  const t0=performance.now();
+  setStatus('水平ゼロ校正中です。約2秒間、平坦で静止してください。','warn');
+  const timer=setInterval(()=>{
+    const up=computeUpVector(); const gyroMag=Math.hypot(...(latest.gyro||[99,99,99]));
+    if(up && gyroMag<4) samples.push(up);
+    if(performance.now()-t0>2000){
+      clearInterval(timer);
+      if(samples.length<8){setStatus('校正サンプル不足です。より静止した状態で再度実行してください。','err'); return;}
+      const mean=normalize(samples.reduce((a,v)=>[a[0]+v[0],a[1]+v[1],a[2]+v[2]],[0,0,0]));
+      const f0raw=axes.f.map((x,i)=>x-dot(axes.f,mean)*mean[i]);
+      const f0=normalize(f0raw); const r0=normalize(cross(mean,f0));
+      if(!f0||!r0){setStatus('校正に失敗しました。設置姿勢または軸設定を確認してください。','err'); return;}
+      calib={ok:true, up0:mean, f0, r0, samples};
+      filter.grade=null; state.confirmedGrade=null; state.candidateGrade=null; state.stopStableSec=0; state.holdState='ARMED';
+      setStatus('水平ゼロ校正完了。坂道停止時に勾配が確定します。','ok');
+      updateDisplay();
+    }
+  },120);
+}
+el('zeroBtn').onclick=zeroCalibrate;
+
+async function startRun(){
+  if(active) return;
+  if(!motionPerm && !geoPerm) await requestAllPermissions();
+  active=true; session={rows:[], points:[], startMs:Date.now(), stopMarks:[]}; state.confirmedGrade=null; state.candidateGrade=null; state.stopStableSec=0; state.holdState=calib.ok?'ARMED':'NO CAL';
+  startGeoWatch(); loop(); el('startBtn').disabled=true; el('stopBtn').disabled=false;
+  setStatus('計測中。平坦でゼロ校正を行ってから評価してください。', calib.ok?'ok':'warn');
+}
+function stopRun(){
+  active=false; stopGeoWatch(); el('startBtn').disabled=false; el('stopBtn').disabled=true; setStatus('計測停止。必要に応じてCSV保存またはCSV再読込で後解析してください。','ok');
+}
+el('startBtn').onclick=startRun; el('stopBtn').onclick=stopRun;
+
+function computeGpsGrade(points){
+  if(points.length<2) return null;
+  const cur=points[points.length-1]; if(!Number.isFinite(cur.alt)) return null;
+  for(let i=points.length-2;i>=0;i--){
+    const p=points[i]; if(!Number.isFinite(p.alt)) continue;
+    const dist=(cur.cumDist||0)-(p.cumDist||0);
+    if(dist>=20){
+      const dz=cur.alt-p.alt;
+      if(Math.abs(dz)>80) return null;
+      return 100*dz/dist;
     }
   }
-  if(calibrated&&forwardDevice&&Number.isFinite(linearAcc.x)&&Number.isFinite(linearAcc.y)&&Number.isFinite(linearAcc.z))longitudinalAcc=dot3([linearAcc.x,linearAcc.y,linearAcc.z],forwardDevice);
-  else longitudinalAcc=null;
-  updateEvaluationState();
-}
-function verifyUphill(){
-  if(!active||!calibrated||!gravityFresh()||!Number.isFinite(rawPitch)){setStatus("重力センサ有効・水平校正済みで確認してください","error");return}
-  if(gpsFresh()&&Number.isFinite(gpsLast?.speedMps)&&gpsLast.speedMps>0.5){setStatus("走行中です。安全に完全停止後に符号を確認してください","error");return}
-  if(Math.abs(rawPitch)<0.7){setStatus("勾配角が小さく符号確認できません（目安0.7度以上）","error");return}
-  if(!confirm("現在、車両は既知の上り坂を向いて完全停止していますか？\n\n現在の推定："+numeric(grade,2)+"%\nこの確認は勾配の符号だけを検証します。"))return;
-  if(rawPitch<0){slopeSign*=-1;rawPitch=-rawPitch;filteredPitch=rawPitch;calculateTask();signNote="符号反転（上り坂停止で確認）";}
-  else signNote="符号正常（上り坂停止で確認）";
-  signVerified=true;signCheckPitch=rawPitch;setStatus("上り坂の符号確認："+signNote,"running");displayTask();
-}
-function resetSlopeSign(){
-  if(recording){setStatus("記録停止後に符号設定をリセットしてください","error");return}
-  slopeSign=1;signVerified=false;signNote="未検証";signCheckPitch=null;
-  if(active&&calibrated&&gravityFresh()){filteredPitch=null;lastFilterTime=null;updateGravityPitch(performance.now());calculateTask()}
-  displayTask();setStatus("勾配の符号検証をリセットしました",active?"running":"stopped");
-}
-function calculateTask(){
-  const p=vehicleParameters();
-  if(!p.valid||!calibrated||!gravityFresh()||filteredPitch===null){pitch=null;grade=null;wheelTorque=null;motorTorque=null;return}
-  pitch=filteredPitch;
-  if(Math.abs(pitch)>=45){grade=null;wheelTorque=null;motorTorque=null;return}
-  const theta=pitch*Math.PI/180;grade=100*Math.tan(theta);const force=p.totalMass*G*Math.abs(Math.sin(theta));
-  wheelTorque=force*p.radius;motorTorque=wheelTorque/(p.ratio*p.efficiency);
+  return null;
 }
 
-function gpsFresh(){return active&&gpsLast!==null&&Date.now()-gpsLast.ts>=-5000&&Date.now()-gpsLast.ts<=GPS_MAX_AGE_MS}
-function gpsPositionOK(p){return p&&Number.isFinite(p.lat)&&Number.isFinite(p.lon)&&Number.isFinite(p.hAcc)&&p.hAcc>=0&&p.hAcc<=GPS_MAX_H_ACC_M}
-function gpsAltitudeOK(p){return gpsPositionOK(p)&&Number.isFinite(p.alt)&&Number.isFinite(p.vAcc)&&p.vAcc>=0&&p.vAcc<=GPS_MAX_V_ACC_M}
-function calculateGPSGrade(){
-  gpsGrade=null;gpsDeltaH=null;gpsWindowDistance=null;if(!gpsFresh()||!gpsLast||!gpsAltitudeOK(gpsLast)||gpsPoints.length<2)return;
-  const end=gpsPoints[gpsPoints.length-1];if(!gpsAltitudeOK(end))return;let best=null,bestDiff=Infinity;
-  for(let i=gpsPoints.length-2;i>=0;i--){const start=gpsPoints[i],ds=end.distance-start.distance;if(ds>GPS_MAX_WINDOW_M)break;if(ds<GPS_MIN_WINDOW_M||!gpsAltitudeOK(start))continue;const d=Math.abs(ds-GPS_TARGET_WINDOW_M);if(d<bestDiff){bestDiff=d;best=start}}
-  if(!best)return;gpsWindowDistance=end.distance-best.distance;gpsDeltaH=end.alt-best.alt;gpsGrade=100*gpsDeltaH/gpsWindowDistance;
-}
-function onGPSPosition(position){
-  if(!active)return;const c=position.coords;
-  const p={lat:c.latitude,lon:c.longitude,alt:c.altitude,hAcc:c.accuracy,vAcc:c.altitudeAccuracy,ts:position.timestamp,distance:gpsTotalDistance,speedMps:null};
-  if(!Number.isFinite(p.lat)||!Number.isFinite(p.lon))return;if(gpsLast&&p.ts<=gpsLast.ts)return;gpsLast=p;gpsError="";
-  if(!gpsPositionOK(p)){calculateGPSGrade();updateEvaluationState();return}
-  if(gpsPoints.length===0){if(Number.isFinite(c.speed)&&c.speed>=0)p.speedMps=c.speed;gpsPoints.push(p);calculateGPSGrade();updateEvaluationState();return}
-  const previous=gpsPoints[gpsPoints.length-1],step=haversineM(previous,p),dt=(p.ts-previous.ts)/1000; if(dt<=0||step>GPS_MAX_STEP_M||step/dt>55){calculateGPSGrade();updateEvaluationState();return}
-  const threshold=(Number.isFinite(p.hAcc)?Math.min(6,Math.max(1.5,p.hAcc*0.08)):2.5); if(step<threshold){p.speedMps=0;calculateGPSGrade();updateEvaluationState();return}
-  gpsTotalDistance+=step; p.distance=gpsTotalDistance; p.speedMps=Number.isFinite(c.speed)&&c.speed>=0?c.speed:step/dt; gpsPoints.push(p); if(gpsPoints.length>GPS_HISTORY_MAX)gpsPoints.splice(0,gpsPoints.length-GPS_HISTORY_MAX);
-  calculateGPSGrade(); updateEvaluationState();
-}
-window.motionCoreOnNativeGPS=function(data){if(!data)return;onGPSPosition({coords:{latitude:data.lat,longitude:data.lon,altitude:data.alt,accuracy:data.hAcc,altitudeAccuracy:data.vAcc,speed:data.speed_mps},timestamp:data.timestamp_ms})}
-function onGPSError(err){gpsError=err?.message||"GPS位置情報を取得できません";gpsGrade=null;gpsDeltaH=null;gpsWindowDistance=null}
-function startGPS(){stopGPS();gpsError="";gpsPoints=[];gpsLast=null;gpsTotalDistance=0;gpsGrade=null;gpsDeltaH=null;gpsWindowDistance=null;if(window.webkit?.messageHandlers?.motionCore)return;if(!navigator.geolocation){gpsError="このブラウザではGPSが利用できません";return}try{gpsWatchId=navigator.geolocation.watchPosition(onGPSPosition,onGPSError,{enableHighAccuracy:true,maximumAge:0,timeout:15000})}catch(e){gpsError=e.message||"GPS開始に失敗しました"}}
-function stopGPS(){if(gpsWatchId!==null&&navigator.geolocation){navigator.geolocation.clearWatch(gpsWatchId)}gpsWatchId=null}
-function gpsDisplayTask(){
-  const fresh=gpsFresh(),valid=fresh&&gpsAltitudeOK(gpsLast); if(fresh&&valid)calculateGPSGrade(); else {gpsGrade=null;gpsDeltaH=null;gpsWindowDistance=null}
-  el("gpsGrade").textContent=numeric(gpsGrade,2)+" %";el("gpsAltitude").textContent=valid?numeric(gpsLast.alt,1)+" m":"-- m";el("gpsDeltaH").textContent=numeric(gpsDeltaH,2)+" m";el("gpsDistance").textContent=numeric(gpsTotalDistance,1)+" m";el("gpsHAcc").textContent=fresh?numeric(gpsLast.hAcc,1)+" m":"-- m";el("gpsVAcc").textContent=fresh?numeric(gpsLast.vAcc,1)+" m":"-- m";el("gpsAge").textContent=gpsLast?numeric(Math.max(0,(Date.now()-gpsLast.ts)/1000),1)+" s":"-- s";el("gpsGradeWindow").textContent="高度差を比較する移動区間："+numeric(gpsWindowDistance,1)+" m";
-  const info=!active?"計測停止中":gpsError?"GPS："+gpsError:!gpsLast?"GPS測位待ち":!fresh?"GPSデータが古いため無効":!gpsPositionOK(gpsLast)?"GPS位置精度不足":!gpsAltitudeOK(gpsLast)?"GPS高度不足（走行ルートは記録中）":gpsGrade===null?"有効な移動区間（50〜150 m）を蓄積中":"GPS区間平均勾配を表示中（参考値）";el("gpsState").textContent=info;
+function computeConfidence(speedKph,longAcc,gyroMag){
+  if(!calib.ok) return null;
+  const sScore=clamp(1-(speedKph||0)/2.0,0,1);
+  const aScore=clamp(1-Math.abs(longAcc||0)/0.35,0,1);
+  const gScore=clamp(1-(gyroMag||0)/5,0,1);
+  return 100*(0.35*sScore+0.35*aScore+0.30*gScore);
 }
 
-function displayTask(){
-  const fresh=gravityFresh(),mfresh=motionFresh();
-  el("pitch").textContent=numeric(pitch)+" °";el("grade").textContent=numeric(grade)+" %";el("roll").textContent=fresh&&calibrated?numeric(roll3D)+" °":"-- °";el("accel").textContent=mfresh?numeric(accelNorm)+" m/s²":"-- m/s²";
-  el("wheelTorque").textContent=numeric(wheelTorque,1)+" Nm";el("motorTorque").textContent=numeric(motorTorque,1)+" Nm";el("usedGrade").textContent=numeric(grade)+" %";
-  const p=vehicleParameters();el("massInfo").textContent=p.valid?"総質量："+p.totalMass.toFixed(1)+" kg":"車両スペックを確認してください";el("count").textContent="記録件数: "+rows.length;
-  el("mountState").textContent=calibrated?"3軸校正済み｜"+mountLabel()+"｜前方軸水平成分："+numeric(mountQuality,2):"設置モード："+mountLabel()+"｜平坦路で3軸ゼロ校正してください";
-  el("torqueInfo").textContent=!p.valid?"車両スペックが不正です":!calibrated?"水平面でゼロ校正してください":!fresh?"センサー更新待ち、または計測停止中":wheelTorque===null?"有効な傾斜値がありません":"3軸姿勢・平坦路ゼロ校正・LPFから演算（車体ピッチ未補正、GPSと独立）";
-  el("imuConfidence").textContent=numeric(imuConfidence,1)+" %";const label=confidenceLabel(imuConfidence); el("imuConfidenceText").textContent=imuConfidence===null?"評価待ち" : `IMU信頼度：${label}（加減速・振動・傾き外乱を簡易評価）`; el("imuConfidence").className="big "+confidenceClass(imuConfidence);
-  el("driveState").textContent=stateLabel(driveState);el("driveState").className="big state-"+(driveState||"unknown").toLowerCase();el("longitudinalAcc").textContent=numeric(longitudinalAcc,2)+" m/s²";el("gpsSpeed").textContent="GPS速度："+numeric(gpsFresh()?gpsLast?.speedMps??null:null,2)+" m/s";
-  el("gravityVector").textContent=gravityFresh()?upDirect.map(x=>numeric(x,3)).join(" / "):"-- / -- / --";
-  el("gravityStatus").textContent=gravityFresh()? (orientationDelta!==null&&orientationDelta>60?"姿勢系と不一致・要検証":gravitySource==="diff"?"3軸差分（直接推定）":"重力込み加速度のみ（参考）") : "無効／更新待ち";
-  el("gravityGrade").textContent=numeric(grade,2)+" %";
-  el("orientationDelta").textContent=numeric(orientationDelta,1)+" °";
-  el("axisStatus").textContent="勾配符号："+signNote+"｜基準：平坦路・静止｜上りを正とする";
-  gpsDisplayTask();updateAnalysisViews();
-}
-function changePeriod(){const requested=Number(el("displayPeriod").value);displayMs=PERIOD_OPTIONS.includes(requested)?requested:250;el("displayPeriod").value=String(displayMs);el("periodLabel").textContent=displayMs+" ms / "+(1000/displayMs).toFixed(Number.isInteger(1000/displayMs)?0:1)+" Hz";try{localStorage.setItem(PERIOD_STORAGE_KEY,String(displayMs))}catch(e){}if(displayTimer!==null){clearInterval(displayTimer);displayTimer=setInterval(displayTask,displayMs)}displayTask()}
-function loadPeriod(){let saved=null;try{saved=Number(localStorage.getItem(PERIOD_STORAGE_KEY))}catch(e){}el("displayPeriod").value=String(PERIOD_OPTIONS.includes(saved)?saved:250);changePeriod()}
-function onParameterChange(){calculateTask();displayTask()}
-
-const CSV_HEADER=["time","beta_deg","gamma_deg","raw_pitch_deg","filtered_pitch_deg","pitch_deg","grade_pct","wheel_torque_Nm","motor_torque_Nm","accel_norm_mps2","gyro_x_degps","gyro_y_degps","gyro_z_degps","linear_acc_x_mps2","linear_acc_y_mps2","linear_acc_z_mps2","vehicle_mass_kg","payload_mass_kg","tire_radius_m","gear_ratio","efficiency","sensor_valid","display_period_ms","gps_altitude_m","gps_horizontal_accuracy_m","gps_vertical_accuracy_m","gps_total_horizontal_distance_m","gps_window_distance_m","gps_delta_altitude_m","gps_grade_pct","gps_fix_time","gps_age_ms","gps_valid","gps_grade_valid","gps_status","device_alpha_deg","3d_roll_deg","mount_forward_horizontal_norm","calibration_mode","gps_latitude_deg","gps_longitude_deg","gps_speed_mps","imu_confidence_pct","drive_state","longitudinal_acc_mps2","mount_mode","gravity_up_x","gravity_up_y","gravity_up_z","gravity_norm_mps2","gravity_source","gravity_age_ms","orientation_gravity_diff_deg","slope_sign_multiplier","slope_sign_verified","slope_sign_note","orientation_event_age_ms","motion_event_age_ms"];
-function appendEvalSample(ts,orientationValid,gpsValid){
-  if(!recording)return; const sample={ts:Date.parse(ts),lat:gpsValid?gpsLast.lat:null,lon:gpsValid?gpsLast.lon:null,distance:gpsValid?gpsTotalDistance:null,grade:orientationValid?grade:null,confidence:imuConfidence,state:driveState,longAcc:longitudinalAcc,speed:gpsValid?gpsLast.speedMps:null};
-  evalSamples.push(sample); if(evalSamples.length>MAX_ROWS)evalSamples.splice(0,evalSamples.length-MAX_ROWS); if(analysisMode==="live")updateAnalysisViews();
-}
-function loggingTask(){
-  if(!active||!recording)return;if(rows.length>=MAX_ROWS){stopRecording();setStatus("記録上限。CSVを保存してください","running");return}
-  const p=vehicleParameters(),orientationValid=calibrated&&gravityFresh(),mfresh=motionFresh(),gpsValid=gpsFresh()&&gpsPositionOK(gpsLast);calculateGPSGrade();const gradeValid=gpsValid&&gpsAltitudeOK(gpsLast)&&gpsGrade!==null;const ts=new Date().toISOString();
-  rows.push([ts,csvNum(orientationValid?beta:null),csvNum(orientationValid?gamma:null),csvNum(orientationValid?rawPitch:null),csvNum(orientationValid?filteredPitch:null),csvNum(orientationValid?pitch:null),csvNum(orientationValid?grade:null),csvNum(orientationValid?wheelTorque:null),csvNum(orientationValid?motorTorque:null),csvNum(mfresh?accelNorm:null),csvNum(mfresh?gyro.x:null),csvNum(mfresh?gyro.y:null),csvNum(mfresh?gyro.z:null),csvNum(mfresh?linearAcc.x:null),csvNum(mfresh?linearAcc.y:null),csvNum(mfresh?linearAcc.z:null),csvNum(p.mass),csvNum(p.payload),csvNum(p.radius),csvNum(p.ratio),csvNum(p.efficiency),orientationValid?1:0,displayMs,csvNum(gpsValid&&gpsAltitudeOK(gpsLast)?gpsLast.alt:null),csvNum(gpsFresh()?gpsLast.hAcc:null),csvNum(gpsFresh()&&gpsAltitudeOK(gpsLast)?gpsLast.vAcc:null),csvNum(gpsTotalDistance),csvNum(gradeValid?gpsWindowDistance:null),csvNum(gradeValid?gpsDeltaH:null),csvNum(gradeValid?gpsGrade:null),gpsLast?new Date(gpsLast.ts).toISOString():"",gpsLast?Math.max(0,Date.now()-gpsLast.ts).toFixed(0):"",gpsValid?1:0,gradeValid?1:0,gpsError?"error":!gpsFresh()?"stale":!gpsValid?"poor_accuracy":!gpsAltitudeOK(gpsLast)?"altitude_unavailable_route_valid":!gradeValid?"insufficient_distance":"valid",csvNum(orientationValid?orientAlpha:null),csvNum(orientationValid?roll3D:null),csvNum(calibrated?mountQuality:null),calibrated?"flat_stop_"+calibratedMountMode+"_3d":"uncalibrated",csvNum(gpsValid?gpsLast.lat:null,7),csvNum(gpsValid?gpsLast.lon:null,7),csvNum(gpsValid?gpsLast.speedMps:null),csvNum(imuConfidence),driveState,csvNum(longitudinalAcc),mountMode,
-    csvNum(gravityFresh()?upDirect[0]:null,6),csvNum(gravityFresh()?upDirect[1]:null,6),csvNum(gravityFresh()?upDirect[2]:null,6),
-    csvNum(gravityFresh()?gravityNorm:null,5),gravityFresh()?gravitySource:"invalid",
-    lastGravityTime!==null?Math.round(performance.now()-lastGravityTime):"",csvNum(orientationDelta,3),slopeSign,signVerified?1:0,signNote,
-    lastOrientationTime!==null?Math.round(performance.now()-lastOrientationTime):"",lastMotionTime!==null?Math.round(performance.now()-lastMotionTime):""]);
-
-  appendEvalSample(ts,orientationValid,gpsValid);
-  if(rows.length>=MAX_ROWS){stopRecording();setStatus("記録上限。CSVを保存してください","running")}
-}
-
-function currentAnalysisSamples(){return analysisMode==="import"?importedSamples:evalSamples}
-function useLiveSamples(){analysisMode="live";el("importState").textContent="ライブ記録を表示中";updateAnalysisViews()}
-function clearImportedSamples(){importedSamples=[];analysisMode="live";el("csvFile").value="";el("importState").textContent="読込データを消去しました。ライブ記録を表示中";updateAnalysisViews()}
-function parseCSVLine(line){return line.split(",")}
-function importCSVFile(event){
-  const file=event.target.files?.[0]; if(!file)return; const reader=new FileReader();
-  reader.onload=()=>{try{const text=String(reader.result||"").replace(/^\uFEFF/,""); const lines=text.split(/\r?\n/).filter(x=>x.trim()!==""); if(lines.length<2)throw Error("CSVデータが不足しています"); const header=parseCSVLine(lines[0]); const idx={}; header.forEach((h,i)=>idx[h.trim()]=i);
-    const needLat=idx["gps_latitude_deg"], needLon=idx["gps_longitude_deg"]; const tmp=[];
-    for(let i=1;i<lines.length;i++){
-      const cols=parseCSVLine(lines[i]); const val=j=>j===undefined||cols[j]===undefined||cols[j].trim()===""?null:Number(cols[j]); const sample={
-        ts: Date.parse(cols[idx["time"]]||""),
-        lat: needLat!==undefined?val(needLat):null,
-        lon: needLon!==undefined?val(needLon):null,
-        distance: idx["gps_total_horizontal_distance_m"]!==undefined?val(idx["gps_total_horizontal_distance_m"]):null,
-        grade: idx["grade_pct"]!==undefined?val(idx["grade_pct"]):null,
-        confidence: idx["imu_confidence_pct"]!==undefined?val(idx["imu_confidence_pct"]):null,
-        state: idx["drive_state"]!==undefined?(cols[idx["drive_state"]]||"UNKNOWN"):(val(idx["gps_speed_mps"])<0.5?"STOP":"UNKNOWN"),
-        longAcc: idx["longitudinal_acc_mps2"]!==undefined?val(idx["longitudinal_acc_mps2"]):null,
-        speed: idx["gps_speed_mps"]!==undefined?val(idx["gps_speed_mps"]):null
-      };
-      if(!Number.isFinite(sample.ts))continue;
-      if(sample.state==="")sample.state="UNKNOWN"; if(Number.isNaN(sample.lat))sample.lat=null; if(Number.isNaN(sample.lon))sample.lon=null; if(Number.isNaN(sample.distance))sample.distance=null; if(Number.isNaN(sample.grade))sample.grade=null; if(Number.isNaN(sample.confidence))sample.confidence=null; if(Number.isNaN(sample.longAcc))sample.longAcc=null; if(Number.isNaN(sample.speed))sample.speed=null;
-      tmp.push(sample);
-    }
-    importedSamples=tmp; analysisMode="import"; el("importState").textContent=`CSV読込完了：${file.name}（${tmp.length}サンプル）`; updateAnalysisViews();
-    if(needLat===undefined||needLon===undefined)el("importState").textContent+=" ／ このCSVには緯度・経度が無いためルート地図は限定表示です。";
-  }catch(e){el("importState").textContent="CSV読込エラー："+e.message;}}
-  reader.readAsText(file,"utf-8");
-}
-
-function drawEmptyCanvas(canvasId,message){const c=el(canvasId),ctx=c.getContext("2d");ctx.clearRect(0,0,c.width,c.height);ctx.fillStyle="#f8fbf9";ctx.fillRect(0,0,c.width,c.height);ctx.fillStyle="#6f8177";ctx.font="22px sans-serif";ctx.textAlign="center";ctx.fillText(message,c.width/2,c.height/2)}
-function updateAnalysisViews(){
-  const samples=currentAnalysisSamples(); el("analysisModeLabel").textContent=analysisMode==="import"?"読込CSV":"ライブ";
-  if(!samples.length){
-    drawEmptyCanvas("routeCanvas","評価データがありません"); drawEmptyCanvas("timelineCanvas","CSV記録を開始するか、保存済みCSVを読込んでください");
-    el("summarySamples").textContent="0"; el("summaryDistance").textContent="0.0 m"; el("summaryConfidence").textContent="-- %"; el("summaryUpGrade").textContent="-- %"; el("summaryDownGrade").textContent="-- %"; el("summaryLowRatio").textContent="-- %"; el("summaryStateMix").textContent="--"; return;
+function loop(ts=performance.now()){
+  if(!active) return;
+  if(ts-lastLoopTs<100){requestAnimationFrame(loop); return;} lastLoopTs=ts;
+  const up=computeUpVector();
+  const gps=latest.gps;
+  let speedKph = Number.isFinite(gps?.speedMps)? gps.speedMps*3.6 : null;
+  let longAcc=null, gyroMag=null, pitch=null, grade=null;
+  if(up && calib.ok){
+    pitch=Math.asin(clamp(dot(up,calib.f0),-1,1))*DEG;
+    grade=Math.tan(pitch*Math.PI/180)*100;
+    filter.grade = filter.grade===null ? grade : (0.85*filter.grade + 0.15*grade);
+    state.filteredGrade=filter.grade;
   }
-  const grades=samples.map(s=>s.grade).filter(Number.isFinite), confs=samples.map(s=>s.confidence).filter(Number.isFinite); const lows=confs.filter(v=>v<60).length;
-  const distCandidates=samples.map(s=>s.distance).filter(Number.isFinite); const distance=distCandidates.length?Math.max(...distCandidates):0;
-  const counts={ACCEL:0,DECEL:0,CRUISE:0,STOP:0,UNKNOWN:0}; samples.forEach(s=>counts[s.state] = (counts[s.state]||0)+1);
-  el("summarySamples").textContent=String(samples.length); el("summaryDistance").textContent=numeric(distance,1)+" m"; el("summaryConfidence").textContent=confs.length?numeric(confs.reduce((a,b)=>a+b,0)/confs.length,1)+" %":"-- %"; el("summaryUpGrade").textContent=grades.length?numeric(Math.max(...grades),2)+" %":"-- %"; el("summaryDownGrade").textContent=grades.length?numeric(Math.min(...grades),2)+" %":"-- %"; el("summaryLowRatio").textContent=confs.length?numeric(100*lows/confs.length,1)+" %":"-- %";
-  const totalState=samples.length||1; el("summaryStateMix").textContent=`加${Math.round(100*counts.ACCEL/totalState)} / 減${Math.round(100*counts.DECEL/totalState)} / 定${Math.round(100*counts.CRUISE/totalState)} %`;
-  drawRouteCanvas(samples); drawTimelineCanvas(samples);
-}
-function drawRouteCanvas(samples){
-  const canvas=el("routeCanvas"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,pad=42; ctx.clearRect(0,0,W,H); ctx.fillStyle="#ffffff"; ctx.fillRect(0,0,W,H);
-  const pts=samples.filter(s=>Number.isFinite(s.lat)&&Number.isFinite(s.lon)); if(pts.length<2){ctx.fillStyle="#6f8177";ctx.font="22px sans-serif";ctx.textAlign="center";ctx.fillText("緯度・経度付きデータが不足しています",W/2,H/2); return}
-  const lat0=pts.reduce((a,p)=>a+p.lat,0)/pts.length, lon0=pts.reduce((a,p)=>a+p.lon,0)/pts.length, cos0=Math.cos(lat0*Math.PI/180), R=6371000;
-  const proj=pts.map(p=>({x:(p.lon-lon0)*Math.PI/180*R*cos0,y:(p.lat-lat0)*Math.PI/180*R,data:p}));
-  const xs=proj.map(p=>p.x), ys=proj.map(p=>p.y), minX=Math.min(...xs), maxX=Math.max(...xs), minY=Math.min(...ys), maxY=Math.max(...ys); let spanX=maxX-minX, spanY=maxY-minY; if(spanX<1)spanX=1; if(spanY<1)spanY=1;
-  const scale=Math.min((W-2*pad)/spanX,(H-2*pad)/spanY); const tx=x=>pad+(x-minX)*scale, ty=y=>H-pad-(y-minY)*scale;
-  ctx.strokeStyle="#dbe7df";ctx.lineWidth=1;ctx.strokeRect(pad,pad,W-2*pad,H-2*pad);
-  ctx.fillStyle="#69796f";ctx.font="14px sans-serif";ctx.textAlign="left";ctx.fillText("Start",tx(proj[0].x)+6,ty(proj[0].y)-6); ctx.textAlign="right";ctx.fillText("End",tx(proj[proj.length-1].x)-6,ty(proj[proj.length-1].y)-6);
-  for(let i=1;i<proj.length;i++){
-    const p0=proj[i-1],p1=proj[i],g=(Number.isFinite(p1.data.grade)?p1.data.grade:p0.data.grade),c=Number.isFinite(p1.data.confidence)?p1.data.confidence:50;
-    ctx.strokeStyle=gradeColor(g); ctx.lineWidth=2+2*clamp(c/100,0,1); ctx.beginPath(); ctx.moveTo(tx(p0.x),ty(p0.y)); ctx.lineTo(tx(p1.x),ty(p1.y)); ctx.stroke();
+  if(latest.acc && calib.ok){ longAcc = dot(latest.acc, calib.f0); }
+  if(latest.gyro){ gyroMag = Math.hypot(latest.gyro[0], latest.gyro[1], latest.gyro[2]); }
+  state.pitch=pitch; state.grade=state.filteredGrade; state.longAcc=longAcc; state.gyroMag=gyroMag;
+  state.confidence=computeConfidence(speedKph,longAcc,gyroMag);
+
+  const stopKphTh=Number(el('stopKphTh').value)||1.0;
+  const stopLike=(calib.ok && Number.isFinite(state.grade) && (speedKph===null || speedKph<=stopKphTh) && Math.abs(longAcc||0)<=0.25 && (gyroMag||99)<=4.0);
+  if(stopLike){
+    state.stopStableSec += 0.1;
+    state.candidateGrade=state.grade;
+    if(state.stopStableSec<1.5) state.holdState='JUDGING';
+    else { state.holdState='HOLD READY'; state.confirmedGrade=state.grade; if(!session.stopMarks.length || Math.abs((session.stopMarks[session.stopMarks.length-1].t||0) - ((Date.now()-session.startMs)/1000))>3){ session.stopMarks.push({t:(Date.now()-session.startMs)/1000, grade:state.confirmedGrade}); } }
+  } else {
+    state.stopStableSec=0;
+    if(!calib.ok) state.holdState='NO CAL';
+    else state.holdState='MOVING';
   }
-  const step=Math.max(1,Math.floor(proj.length/50));
-  for(let i=0;i<proj.length;i+=step){const p=proj[i]; const r=3+4*clamp((p.data.confidence??50)/100,0,1); ctx.beginPath();ctx.fillStyle=stateColor(p.data.state||"UNKNOWN");ctx.arc(tx(p.x),ty(p.y),r,0,Math.PI*2);ctx.fill();ctx.lineWidth=Number.isFinite(p.data.confidence)&&p.data.confidence<60?2:1;ctx.strokeStyle=Number.isFinite(p.data.confidence)&&p.data.confidence<60?"#c54a4a":"#ffffff";ctx.stroke()}
-}
-function drawTimelineCanvas(samples){
-  const canvas=el("timelineCanvas"),ctx=canvas.getContext("2d"),W=canvas.width,H=canvas.height,padL=64,padR=20,padT=28,padB=30; ctx.clearRect(0,0,W,H); ctx.fillStyle="#fff"; ctx.fillRect(0,0,W,H);
-  if(samples.length<2){ctx.fillStyle="#6f8177";ctx.font="22px sans-serif";ctx.textAlign="center";ctx.fillText("時系列データが不足しています",W/2,H/2); return}
-  const innerW=W-padL-padR, innerH=H-padT-padB, laneH=innerH/3;
-  const xs=samples.map((_,i)=>padL + innerW*(i/(samples.length-1)));
-  const laneY=i=>padT+i*laneH;
-  const labels=["勾配[%]","IMU信頼度[%]","前後加速度[m/s²]"]; ctx.font="13px sans-serif"; ctx.fillStyle="#5e7064";
-  for(let i=0;i<3;i++){const y=laneY(i); ctx.strokeStyle="#dbe7df"; ctx.strokeRect(padL,y,innerW,laneH); ctx.fillText(labels[i],8,y+18)}
-  // state background strip at bottom lane
-  for(let i=1;i<samples.length;i++){ctx.fillStyle=stateColor(samples[i].state||"UNKNOWN")+"22"; ctx.fillRect(xs[i-1],laneY(2),xs[i]-xs[i-1],laneH)}
-  const gradeVals=samples.map(s=>Number.isFinite(s.grade)?s.grade:0), maxGrade=Math.max(5,...gradeVals.map(v=>Math.abs(v)));
-  ctx.strokeStyle="#ef4444"; ctx.lineWidth=2; ctx.beginPath();
-  samples.forEach((s,i)=>{const val=Number.isFinite(s.grade)?s.grade:0; const y=laneY(0)+laneH/2 - (val/maxGrade)*(laneH*0.42); i?ctx.lineTo(xs[i],y):ctx.moveTo(xs[i],y)}); ctx.stroke();
-  ctx.strokeStyle="#8b5cf6"; ctx.beginPath(); samples.forEach((s,i)=>{const val=Number.isFinite(s.confidence)?s.confidence:0; const y=laneY(1)+laneH - (val/100)*(laneH*0.9) - laneH*0.05; i?ctx.lineTo(xs[i],y):ctx.moveTo(xs[i],y)}); ctx.stroke();
-  const maxAcc=Math.max(1.5,...samples.map(s=>Math.abs(s.longAcc||0))); ctx.strokeStyle="#0f766e"; ctx.beginPath(); samples.forEach((s,i)=>{const val=Number.isFinite(s.longAcc)?s.longAcc:0; const y=laneY(2)+laneH/2 - (val/maxAcc)*(laneH*0.42); i?ctx.lineTo(xs[i],y):ctx.moveTo(xs[i],y)}); ctx.stroke();
-  ctx.fillStyle="#6f8177"; ctx.textAlign="right"; ctx.fillText(samples.length+"点",W-6,16); ctx.textAlign="left";
+  updateDisplay();
+  logRow();
+  renderGPS();
+  requestAnimationFrame(loop);
 }
 
-function startTasks(){stopTasks();calcTimer=setInterval(calculateTask,CALC_MS);displayTimer=setInterval(displayTask,displayMs);logTimer=setInterval(loggingTask,LOG_MS)}
-function stopTasks(){if(calcTimer!==null){clearInterval(calcTimer);calcTimer=null}if(displayTimer!==null){clearInterval(displayTimer);displayTimer=null}if(logTimer!==null){clearInterval(logTimer);logTimer=null}}
-async function startSensor(){
-  if(active)return;
-  try{
-    const native=!!window.webkit?.messageHandlers?.motionCore;
-    if(!native&&!window.isSecureContext)throw Error("HTTPSで開いてください");
-    if(!native&&typeof DeviceOrientationEvent==="undefined")throw Error("姿勢センサーが利用できません");
-    const requests=[]; if(!native&&typeof DeviceOrientationEvent.requestPermission==="function")requests.push(DeviceOrientationEvent.requestPermission()); if(!native&&typeof DeviceMotionEvent!=="undefined"&&typeof DeviceMotionEvent.requestPermission==="function")requests.push(DeviceMotionEvent.requestPermission());
-    const results=await Promise.all(requests); if(results.some(x=>x!=="granted"))throw Error("センサー利用が許可されませんでした");
-    active=true;recording=false;calibrated=false;beta=null;gamma=null;orientAlpha=null;zeroBeta=0;upNow=null;upZero=null;forwardDevice=null;rightDevice=null;mountQuality=null;roll3D=null;rawPitch=null;filteredPitch=null;pitch=null;grade=null;accelNorm=null;wheelTorque=null;motorTorque=null;imuConfidence=null;longitudinalAcc=null;driveState="UNKNOWN";lastOrientationTime=null;lastMotionTime=null;lastFilterTime=null;gyro={x:null,y:null,z:null};linearAcc={x:null,y:null,z:null};upDirect=null;upSensor=null;gravitySource="none";lastGravityTime=null;gravityNorm=null;orientationDelta=null;slopeSign=1;signVerified=false;signNote="未検証";signCheckPitch=null;el("calState").textContent="3軸水平基準：未校正";
-    if(!native){window.addEventListener("deviceorientation",onOrientation);window.addEventListener("devicemotion",onMotion)}
-    startGPS(); if(window.webkit?.messageHandlers?.motionCore)window.webkit.messageHandlers.motionCore.postMessage({action:"start"}); startTasks(); updateButtons(); displayTask(); setStatus("計測中・水平校正待ち","running");
-  }catch(e){active=false;stopTasks();stopGPS();updateButtons();setStatus("開始エラー："+e.message,"error")}
+function updateDisplay(){
+  el('pitchNow').textContent=fmt(state.pitch,2,' °');
+  el('gradeNow').textContent=fmt(state.grade,2,' %');
+  el('gradeCandidate').textContent=fmt(state.candidateGrade,2,' %');
+  el('gradeConfirmed').textContent=fmt(state.confirmedGrade,2,' %');
+  el('stableSec').textContent=fmt(state.stopStableSec,1,' s');
+  el('confidence').textContent=fmt(state.confidence,0,' %');
+  el('gpsSpeed').textContent=fmt(Number.isFinite(latest.gps?.speedMps)?latest.gps.speedMps*3.6:null,1,' km/h');
+  el('longAcc').textContent=fmt(state.longAcc,3,' m/s²');
+  el('gyroMag').textContent=fmt(state.gyroMag,2,' deg/s');
+  el('sensorValid').textContent=(latest.motionTs&&performance.now()-latest.motionTs<1500)?'OK':'NG';
+  el('gpsLat').textContent=fmtPlain(latest.gps?.lat,6);
+  el('gpsLon').textContent=fmtPlain(latest.gps?.lon,6);
+  el('gpsAlt').textContent=fmt(latest.gps?.alt,1,' m');
+  el('gpsDist').textContent=fmt(session.points.at(-1)?.cumDist||0,1,' m');
+  el('gpsGrade').textContent=fmt(state.gpsGrade,2,' %');
+  el('gpsAcc').textContent=fmt(latest.gps?.accM,1,' m');
+  const box=el('holdState'); box.textContent=state.holdState;
+  const cls = state.holdState==='HOLD READY'?'state-ok':state.holdState==='JUDGING'?'state-warn':(state.holdState==='MOVING'||state.holdState==='NO CAL')?'state-bad':'state-off';
+  box.className='stateBox '+cls;
 }
-function stopSensor(){if(!active)return;window.removeEventListener("deviceorientation",onOrientation);window.removeEventListener("devicemotion",onMotion);stopGPS();if(window.webkit?.messageHandlers?.motionCore)window.webkit.messageHandlers.motionCore.postMessage({action:"stop"});stopTasks();active=false;stopRecording();pitch=null;grade=null;wheelTorque=null;motorTorque=null;accelNorm=null;imuConfidence=null;longitudinalAcc=null;lastGravityTime=null;upDirect=null;updateButtons();displayTask();setStatus("計測停止中","stopped")}
-function calibrate(){
-  if(!active||!gravityFresh()||!motionFresh()||!upDirect||gravitySource!=="diff"){setStatus("重力込み加速度と線形加速度の両方が必要です。センサ更新を確認してください",active?"running":"stopped");return}
-  const axis=getMountAxis(),uy=dot3(axis,upDirect),horizontal=axis.map((v,i)=>v-uy*upDirect[i]),q=norm3(horizontal);
-  if(q<0.40){setStatus("選択した前方軸が上方向に近すぎます。設置モード・向きを見直してください","error");return}
-  if(!confirm("車両は平坦路で完全停止していますか？\n設置モード："+mountLabel()+"\n\nこの姿勢をゼロ勾配として保存します。"))return;
-  upZero=[...upDirect];forwardDevice=horizontal.map(v=>v/q);rightDevice=cross3(forwardDevice,upZero);const rn=norm3(rightDevice);rightDevice=rightDevice.map(v=>v/rn);mountQuality=q;zeroBeta=beta;calibratedMountMode=mountMode;calibrated=true;slopeSign=1;signVerified=false;signNote="未検証";signCheckPitch=null;rawPitch=0;filteredPitch=0;roll3D=0;lastFilterTime=performance.now();calculateTask();updateEvaluationState();displayTask();el("calState").textContent="3軸水平基準：校正済み（今回の計測のみ）";setStatus("3軸水平ゼロ校正完了","running");
+
+function logRow(){
+  if(!active) return;
+  const t=((Date.now()-session.startMs)/1000).toFixed(2);
+  const p=latest.gps||{};
+  session.rows.push({
+    t_s:t, time_iso:new Date().toISOString(),
+    beta_deg:latest.beta, gamma_deg:latest.gamma,
+    accg_x:latest.aig?.[0], accg_y:latest.aig?.[1], accg_z:latest.aig?.[2],
+    acc_x:latest.acc?.[0], acc_y:latest.acc?.[1], acc_z:latest.acc?.[2],
+    gyro_x:latest.gyro?.[0], gyro_y:latest.gyro?.[1], gyro_z:latest.gyro?.[2],
+    pitch_deg:state.pitch, grade_pct:state.grade, candidate_grade_pct:state.candidateGrade, confirmed_grade_pct:state.confirmedGrade,
+    confidence_pct:state.confidence, hold_state:state.holdState,
+    gps_lat:p.lat, gps_lon:p.lon, gps_alt_m:p.alt, gps_speed_mps:p.speedMps, gps_accuracy_m:p.accM, gps_grade_pct:state.gpsGrade,
+    gps_distance_m:session.points.at(-1)?.cumDist||0, sensor_valid:(latest.motionTs&&performance.now()-latest.motionTs<1500)?1:0
+  });
 }
-function stopRecording(){recording=false;el("recordBtn").textContent="⏺ CSV記録開始"}
-function toggleRecord(){if(!active||!calibrated){setStatus("計測開始と水平校正が必要です",active?"running":"stopped");return}if(!recording&&rows.length>=MAX_ROWS){setStatus("記録上限。CSV保存後に消去してください","running");return}recording=!recording;el("recordBtn").textContent=recording?"⏹ CSV記録停止":"⏺ CSV記録開始";setStatus(recording?"CSV記録中":"計測中","running")}
-function csvEscape(v){const s=String(v??"");return /[",\r\n]/.test(s)?'"'+s.replace(/"/g,'""')+'"':s}
-function saveCSV(){if(!rows.length){setStatus("記録データがありません",active?"running":"stopped");return}const csv=[CSV_HEADER.join(","),...rows.map(r=>r.map(csvEscape).join(","))].join("\r\n"),blob=new Blob(["\uFEFF",csv],{type:"text/csv;charset=utf-8"}),url=URL.createObjectURL(blob),a=document.createElement("a");a.href=url;a.download="motioncore_hill_v100_direct_gravity.csv";document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),5000);setStatus("CSV保存操作を実行しました",active?"running":"stopped")}
-function clearCSV(){if(recording){setStatus("記録停止後に消去してください","running");return}if(!rows.length&&!evalSamples.length)return;if(!confirm("記録を消去しますか？"))return;rows=[];evalSamples=[];if(analysisMode==="live")updateAnalysisViews();displayTask();setStatus("記録データを消去しました",active?"running":"stopped")}
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&active)stopSensor()});updateButtons();loadPeriod();displayTask();updateAnalysisViews();
+
+function downloadCsv(){
+  if(!session.rows.length){setStatus('保存できるデータがありません。','warn'); return;}
+  const headers=Object.keys(session.rows[0]);
+  const lines=[headers.join(',')].concat(session.rows.map(r=>headers.map(h=>{
+    const v=r[h]; if(v===null||v===undefined) return ''; if(typeof v==='number'&&Number.isFinite(v)) return String(v); const s=String(v).replace(/"/g,'""'); return /[",\n]/.test(s)?`"${s}"`:s;
+  }).join(',')));
+  const blob=new Blob([lines.join('\n')],{type:'text/csv;charset=utf-8'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=`MOTION_CORE_HILL_ASSIST_v1_2_${new Date().toISOString().replace(/[:.]/g,'-')}.csv`; a.click(); URL.revokeObjectURL(a.href);
+}
+el('csvBtn').onclick=downloadCsv;
+
+function parseCsvText(text){
+  const rows=[]; let i=0,row=[],cell='',q=false; const out=[];
+  while(i<text.length){const c=text[i]; if(q){ if(c==='"'&&text[i+1]==='"'){cell+='"'; i++;} else if(c==='"'){q=false;} else cell+=c; }
+    else { if(c==='"') q=true; else if(c===','){row.push(cell); cell='';} else if(c==='\n'){row.push(cell); out.push(row); row=[]; cell='';} else if(c!=='\r'){cell+=c;} }
+    i++; }
+  if(cell.length||row.length){row.push(cell); out.push(row);} if(!out.length) return rows;
+  const headers=out[0]; for(let r=1;r<out.length;r++){const obj={}; headers.forEach((h,idx)=>{const v=out[r][idx]??''; const n=Number(v); obj[h]=(v!=='' && !Number.isNaN(n))?n:v;}); rows.push(obj);} return rows;
+}
+el('csvFile').addEventListener('change', async e=>{
+  const file=e.target.files?.[0]; if(!file) return;
+  const text=await file.text(); const rows=parseCsvText(text); if(!rows.length){setStatus('CSV読込に失敗しました。','err'); return;}
+  session.rows=rows;
+  session.points=[]; session.stopMarks=[];
+  for(const r of rows){
+    if(Number.isFinite(r.gps_lat)&&Number.isFinite(r.gps_lon)) session.points.push({lat:r.gps_lat, lon:r.gps_lon, alt:r.gps_alt_m, cumDist:r.gps_distance_m});
+    if(Number.isFinite(r.confirmed_grade_pct)) session.stopMarks.push({t:r.t_s, grade:r.confirmed_grade_pct});
+  }
+  setStatus(`CSV読込完了：${rows.length}行`, 'ok'); renderGPS(); switchTab('gps');
+});
+
+function drawRoute(){
+  const c=el('routeCanvas'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height);
+  ctx.fillStyle='#fbfdfc'; ctx.fillRect(0,0,c.width,c.height);
+  ctx.strokeStyle='#d9e8e1'; ctx.strokeRect(0.5,0.5,c.width-1,c.height-1);
+  const pts=session.points.filter(p=>Number.isFinite(p.lat)&&Number.isFinite(p.lon));
+  if(pts.length<2){ctx.fillStyle='#6f877c'; ctx.font='16px sans-serif'; ctx.fillText('GPSデータ待機中 / CSV未読込',20,28); return;}
+  let minLat=Infinity,maxLat=-Infinity,minLon=Infinity,maxLon=-Infinity;
+  pts.forEach(p=>{if(p.lat<minLat)minLat=p.lat; if(p.lat>maxLat)maxLat=p.lat; if(p.lon<minLon)minLon=p.lon; if(p.lon>maxLon)maxLon=p.lon;});
+  const pad=28, dx=Math.max(1e-6,maxLon-minLon), dy=Math.max(1e-6,maxLat-minLat);
+  const sx=(c.width-2*pad)/dx, sy=(c.height-2*pad)/dy; const s=Math.min(sx,sy);
+  const mapXY=p=>({x:pad+(p.lon-minLon)*s, y:c.height-pad-(p.lat-minLat)*s});
+  ctx.strokeStyle='#147fc3'; ctx.lineWidth=3; ctx.beginPath(); pts.forEach((p,i)=>{const m=mapXY(p); if(i===0)ctx.moveTo(m.x,m.y); else ctx.lineTo(m.x,m.y);}); ctx.stroke();
+  const a=mapXY(pts[0]), b=mapXY(pts[pts.length-1]);
+  ctx.fillStyle='#19a465'; ctx.beginPath(); ctx.arc(a.x,a.y,6,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#db4d4d'; ctx.beginPath(); ctx.arc(b.x,b.y,6,0,Math.PI*2); ctx.fill();
+  ctx.fillStyle='#32584c'; ctx.font='13px sans-serif'; ctx.fillText('Start',a.x+8,a.y-8); ctx.fillText('End',b.x+8,b.y-8);
+}
+
+function drawTrend(){
+  const c=el('trendCanvas'), ctx=c.getContext('2d'); ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle='#fbfdfc'; ctx.fillRect(0,0,c.width,c.height); ctx.strokeStyle='#d9e8e1'; ctx.strokeRect(0.5,0.5,c.width-1,c.height-1);
+  const rows=session.rows; if(rows.length<2){ctx.fillStyle='#6f877c'; ctx.font='16px sans-serif'; ctx.fillText('時系列データ待機中 / CSV未読込',20,28); return;}
+  const pts=rows.map(r=>({t:Number(r.t_s), imu:Number(r.grade_pct), gps:Number(r.gps_grade_pct), conf:Number(r.confirmed_grade_pct)})).filter(r=>Number.isFinite(r.t));
+  const tMin=pts[0].t, tMax=pts.at(-1).t||1; const yMin=-15, yMax=15; const padL=44,padR=12,padT=12,padB=28;
+  const X=t=>padL+(c.width-padL-padR)*(t-tMin)/Math.max(1e-6,tMax-tMin), Y=v=>c.height-padB-(c.height-padT-padB)*(v-yMin)/(yMax-yMin);
+  ctx.strokeStyle='#d5e4dd'; ctx.lineWidth=1; for(let y=-10;y<=10;y+=5){const py=Y(y); ctx.beginPath(); ctx.moveTo(padL,py); ctx.lineTo(c.width-padR,py); ctx.stroke(); ctx.fillStyle='#789084'; ctx.font='11px sans-serif'; ctx.fillText(`${y}%`,6,py+4);}
+  ctx.strokeStyle='#0f9d58'; ctx.lineWidth=2; ctx.beginPath(); let started=false; for(const p of pts){ if(Number.isFinite(p.imu)){ const x=X(p.t), y=Y(clamp(p.imu,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
+  ctx.strokeStyle='#2276cc'; ctx.lineWidth=2; ctx.beginPath(); started=false; for(const p of pts){ if(Number.isFinite(p.gps)){ const x=X(p.t), y=Y(clamp(p.gps,yMin,yMax)); if(!started){ctx.moveTo(x,y); started=true;} else ctx.lineTo(x,y);} } ctx.stroke();
+  ctx.fillStyle='#da8b13'; for(const p of pts){ if(Number.isFinite(p.conf)){ ctx.beginPath(); ctx.arc(X(p.t), Y(clamp(p.conf,yMin,yMax)), 3, 0, Math.PI*2); ctx.fill(); } }
+  ctx.fillStyle='#31564a'; ctx.font='12px sans-serif'; ctx.fillText('緑: IMU勾配', padL, 18); ctx.fillText('青: GPS勾配', padL+120, 18); ctx.fillText('橙点: 停止時確定勾配', padL+235, 18);
+}
+
+function renderGPS(){drawRoute(); drawTrend();}
+
+updateDisplay(); renderGPS();
+})();
 </script>
 </body>
 </html>
